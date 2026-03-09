@@ -1,0 +1,12 @@
+{
+  "title": "Part 4: 路径 (Path)",
+  "pages": [
+    "index",
+    "1-path-element",
+    "2-line-commands",
+    "3-bezier-curves",
+    "4-arcs",
+    "5-fill-rules",
+    "6-optimization"
+  ]
+}

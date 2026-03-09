@@ -1,0 +1,47 @@
+---
+title: "5.2 填充 (Fill)"
+description: 掌握颜色填充、不透明度以及填充规则。
+---
+
+import { StyleDemo } from '@/components/demos/StyleDemo';
+
+# 5.2 填充 (Fill)
+
+`fill` 属性定义了图形内部的颜色。对于 SVG 来说，任何封闭或未封闭的图形都可以被填充。
+
+## 5.2.1 颜色值
+
+SVG 支持所有 CSS 颜色格式：
+- **关键字**: `red`, `blue`, `transparent`, `currentColor` 等。
+- **十六进制**: `#ff0000`, `#f00`。
+- **RGB/RGBA**: `rgb(255, 0, 0)`, `rgba(255, 0, 0, 0.5)`。
+- **HSL/HSLA**: `hsl(0, 100%, 50%)`。
+
+### 特殊值：`none`
+`fill="none"` 表示不填充。这是默认值通常是黑色（`black`），所以如果你只想要描边，必须显式设置 `fill="none"`。
+
+### 特殊值：`currentColor`
+`fill="currentColor"` 让 SVG 图形继承父元素的文本颜色。这在制作图标系统时非常有用——图标颜色会自动跟随文字颜色变化。
+
+## 5.2.2 填充不透明度 (`fill-opacity`)
+
+除了使用 RGBA 颜色外，你还可以使用 `fill-opacity` 属性单独控制填充颜色的不透明度。
+
+- 值范围：`0` (完全透明) 到 `1` (完全不透明)。
+
+```xml
+<rect fill="red" fill-opacity="0.5" ... />
+```
+这等同于 `fill="rgba(255, 0, 0, 0.5)"`。
+
+## 5.2.3 开放路径的填充
+
+有趣的是，即使路径没有闭合（没有 `Z` 命令），SVG 也会尝试填充它。它会简单地连接起点和终点，然后填充这个区域。
+
+### 交互演示：调整填充
+
+试着调整下方演示中的 `Fill Opacity` 滑块，观察半透明填充的效果。
+
+<div className="my-8">
+  <StyleDemo />
+</div>

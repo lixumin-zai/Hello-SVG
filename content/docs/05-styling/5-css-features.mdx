@@ -1,0 +1,46 @@
+---
+title: "5.5 SVG 中的 CSS 特性"
+description: 探索 pointer-events, vector-effect 等 SVG 独有的 CSS 属性。
+---
+
+# 5.5 SVG 中的 CSS 特性
+
+除了常规的 CSS 属性，SVG 还有一些特有的 CSS 属性，能解决特定的图形问题。
+
+## 5.5.1 `vector-effect: non-scaling-stroke`
+
+当你缩放一个 SVG 图形时，默认情况下，描边宽度也会随之缩放。例如，一个 1px 宽的线，放大 10 倍后，线条宽度会变成 10px，看起来非常粗糙。
+
+`vector-effect="non-scaling-stroke"` 可以解决这个问题。它强制描边宽度保持为屏幕像素的固定值，不受坐标系缩放的影响。
+
+```xml
+<path d="..." stroke="black" stroke-width="1" vector-effect="non-scaling-stroke" />
+```
+无论你如何放大这个路径，它的边框始终是 1px 细。这在地图应用中非常重要。
+
+## 5.5.2 `pointer-events`
+
+这个属性控制图形如何响应鼠标事件。
+
+- **`visiblePainted`** (默认): 只有在填充区域或描边区域（且可见时）才响应。
+- **`visible`**: 只要在图形范围内（包括透明填充）就响应。
+- **`none`**: 完全不响应鼠标事件，鼠标穿透。
+- **`all`**: 即使 `fill="none"` 且 `stroke="none"`，也能响应点击。这常用于创建一个不可见的点击热区。
+
+## 5.5.3 `shape-rendering`
+
+这个属性告诉浏览器如何优化渲染。
+
+- **`auto`** (默认): 浏览器自动权衡。
+- **`optimizeSpeed`**: 优先速度，可能会关闭抗锯齿。
+- **`crispEdges`**: 关闭抗锯齿，主要用于保持线条锐利（适合二维码、像素画）。
+- **`geometricPrecision`**: 优先精度，开启最高质量的抗锯齿。
+
+## 5.5.4 总结
+
+SVG 的样式系统极其强大且灵活。通过结合 CSS，我们可以：
+1.  实现响应式 SVG（利用 Media Queries）。
+2.  利用 CSS 变量（Custom Properties）实现主题切换。
+3.  利用 CSS 动画实现复杂的交互效果。
+
+至此，你已经掌握了 SVG 的绘制和样式。接下来的章节，我们将进入更高级的领域：**变换 (Transforms)**。

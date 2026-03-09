@@ -1,0 +1,58 @@
+---
+title: "5.3 描边 (Stroke)"
+description: 深入学习描边的各种属性：宽度、端点、连接和虚线。
+---
+
+import { StyleDemo } from '@/components/demos/StyleDemo';
+
+# 5.3 描边 (Stroke)
+
+描边是 SVG 中最复杂的样式部分。除了简单的颜色和宽度，它还有很多控制线条细节的属性。
+
+## 5.3.1 基础属性
+
+- **`stroke`**: 描边颜色（默认为 `none`）。
+- **`stroke-width`**: 描边宽度（默认为 1）。
+- **`stroke-opacity`**: 描边不透明度。
+
+## 5.3.2 线条端点 (`stroke-linecap`)
+
+这个属性决定了开放路径两端的形状。
+
+- **`butt`** (默认): 直角边缘，线条在端点处直接截断。
+- **`round`**: 圆角边缘，在端点处增加一个半圆（半径为线宽的一半）。
+- **`square`**: 方形边缘，在端点处增加一个矩形（长度为线宽的一半）。
+
+**注意**: `round` 和 `square` 会让线条看起来比实际定义的坐标稍微长一点。
+
+## 5.3.3 线条连接 (`stroke-linejoin`)
+
+这个属性决定了当两条线段转折连接时，转角处的形状。
+
+- **`miter`** (默认): 尖角。外侧边缘延伸直到相交。
+- **`round`**: 圆角。转角处是圆滑的。
+- **`bevel`**: 斜角。转角处被切平。
+
+**注意**: 当两条线夹角非常小时，`miter` 产生的尖角会非常长。为了避免这种情况，可以使用 `stroke-miterlimit` 属性来限制尖角长度，超过限制会自动回退到 `bevel`。
+
+## 5.3.4 虚线 (`stroke-dasharray`)
+
+这个属性可以将实线变为虚线。它接受一组数字，表示“实线长度、间隙长度、实线长度、间隙长度...”。
+
+- `stroke-dasharray="5, 5"`: 5px 实线，5px 间隙，循环。
+- `stroke-dasharray="10, 5"`: 10px 实线，5px 间隙，循环。
+- `stroke-dasharray="20, 10, 5, 10"`: 20px 实线，10px 间隙，5px 实线，10px 间隙，循环。
+
+## 5.3.5 虚线偏移 (`stroke-dashoffset`)
+
+这个属性定义了虚线模式的起始偏移量。通过动态改变 `stroke-dashoffset`，可以实现著名的“描边动画”效果（Line Drawing Animation）。
+
+### 交互演示：玩转描边
+
+这是本章最有趣的演示。试着：
+1.  增加 `Width` 观察 `linecap` 和 `linejoin` 的效果。
+2.  在 `Dasharray` 输入框输入 `10 5`，然后拖动 `Dashoffset` 滑块，看看线条是如何“流动”的。
+
+<div className="my-8">
+  <StyleDemo />
+</div>

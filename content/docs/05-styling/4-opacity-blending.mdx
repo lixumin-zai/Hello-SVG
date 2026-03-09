@@ -1,0 +1,55 @@
+---
+title: "5.4 透明度与混合"
+description: 理解 opacity, fill-opacity, stroke-opacity 以及混合模式。
+---
+
+import { StyleDemo } from '@/components/demos/StyleDemo';
+
+# 5.4 透明度与混合
+
+在 SVG 中，控制透明度有多种方式，它们的效果略有不同。
+
+## 5.4.1 整体透明度 (`opacity`)
+
+`opacity` 属性作用于**整个元素**（包括填充和描边）。
+
+- 所有的子元素都会继承这个透明度。
+- 整个图形会被渲染到一个离屏缓冲区，应用透明度后，再合成到背景上。这意味着图形内部重叠的部分**不会**透视出来。
+
+```xml
+<g opacity="0.5">
+  <circle cx="50" cy="50" r="40" fill="red" />
+  <circle cx="80" cy="50" r="40" fill="blue" />
+</g>
+```
+两个圆重叠的部分不会变深，整个组作为一个整体半透明。
+
+## 5.4.2 填充与描边透明度 (`fill-opacity`, `stroke-opacity`)
+
+这两个属性分别控制填充和描边的透明度。
+
+- 如果 `fill-opacity="0.5"` 且 `stroke-opacity="0.5"`，那么填充和描边重叠的地方（描边通常有一半画在填充区域上）**会**产生叠加效果，看起来更不透明。
+
+## 5.4.3 混合模式 (`mix-blend-mode`)
+
+SVG 元素完全支持 CSS 的 `mix-blend-mode` 属性。这意味着你可以实现类似 Photoshop 的图层混合效果。
+
+常用模式：
+- `multiply` (正片叠底): 变暗。
+- `screen` (滤色): 变亮。
+- `overlay` (叠加): 增加对比度。
+- `difference` (差值): 产生反色效果。
+
+```xml
+<circle cx="50" cy="50" r="40" fill="red" style="mix-blend-mode: multiply;" />
+<circle cx="80" cy="50" r="40" fill="blue" style="mix-blend-mode: multiply;" />
+```
+两个圆重叠的部分会变成深紫色。
+
+### 交互演示
+
+在前面的演示中，你可以分别调整 `Fill Opacity` 和 `Stroke Opacity`，观察它们是如何独立工作的。
+
+<div className="my-8">
+  <StyleDemo />
+</div>

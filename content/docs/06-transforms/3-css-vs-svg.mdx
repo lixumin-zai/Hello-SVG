@@ -1,0 +1,49 @@
+---
+title: "6.3 CSS Transform vs SVG transform"
+description: 比较两种变换系统的关键差异，特别是变换原点的问题。
+---
+
+# 6.3 CSS Transform vs. SVG transform
+
+这是一个常见的混淆点。你可以用 SVG 属性 `transform="..."`，也可以用 CSS 属性 `style="transform: ..."`。它们大部分时候表现一致，但有一个巨大的区别：**变换原点 (Transform Origin)**。
+
+## 6.3.1 默认原点的差异
+
+### SVG `transform` 属性
+- **默认原点**: 当前用户坐标系的 `(0, 0)`（通常是 SVG 画布的左上角）。
+- **表现**: `rotate(45)` 会让元素围绕画布左上角旋转，看起来像是“荡秋千”。
+
+### CSS `transform` 属性
+- **默认原点**: 元素的**几何中心** (`50% 50%`)。
+- **表现**: `rotate(45deg)` 会让元素原地自转。
+
+## 6.3.2 单位的差异
+
+### SVG `transform` 属性
+- **单位**: 默认无单位（即用户单位 px），旋转是角度（度）。
+- **语法**: `translate(10, 10)` (不能带 px), `rotate(45)` (不能带 deg)。
+
+### CSS `transform` 属性
+- **单位**: 必须带单位。
+- **语法**: `translate(10px, 10px)`, `rotate(45deg)`。
+
+## 6.3.3 如何选择？
+
+- **使用 SVG 属性**：当你需要精确控制坐标系，或者需要兼容旧版浏览器/导出工具时。特别是当你希望利用 `rotate(45, cx, cy)` 这种便捷语法指定旋转中心时（CSS 做不到这一点，必须改 `transform-origin`）。
+- **使用 CSS 属性**：当你做动画时。CSS 动画（Keyframes）性能更好，且利用 GPU 加速。而且 CSS 的默认原点（中心旋转）通常更符合动画需求。
+
+### 示例：原地旋转
+
+**SVG 方式**:
+你需要显式计算中心点。
+```xml
+<!-- 假设 rect 中心在 50,50 -->
+<rect x="0" y="0" width="100" height="100" transform="rotate(45, 50, 50)" />
+```
+
+**CSS 方式**:
+自动围绕中心。
+```xml
+<rect x="0" y="0" width="100" height="100" style="transform-box: fill-box; transform-origin: center; transform: rotate(45deg);" />
+```
+注意：在 CSS 中处理 SVG 变换原点时，需要设置 `transform-box: fill-box`，否则 `transform-origin: center` 可能会相对于整个 SVG 画布（viewBox）计算，而不是元素自身的包围盒。

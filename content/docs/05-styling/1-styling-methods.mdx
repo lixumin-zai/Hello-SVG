@@ -1,0 +1,78 @@
+---
+title: "5.1 SVG 样式的三种方式"
+description: 学习通过属性、内联样式和外部 CSS 控制 SVG 外观。
+---
+
+import { StyleDemo } from '@/components/demos/StyleDemo';
+
+# 5.1 SVG 样式的三种方式
+
+SVG 的一个强大之处在于它与 CSS 的紧密集成。你可以使用与 HTML 几乎相同的方式来给 SVG 添加样式。
+
+## 5.1.1 表现属性 (Presentation Attributes)
+
+这是 SVG 最原始的样式方式。每个样式属性（如 `fill`, `stroke`, `stroke-width`）都可以直接作为 XML 属性写在元素上。
+
+```xml
+<rect x="10" y="10" width="100" height="100" 
+      fill="red" stroke="blue" stroke-width="5" />
+```
+
+**优点**：
+- 兼容性最好（所有 SVG 查看器都支持）。
+- 优先级最低（容易被 CSS 覆盖）。
+
+## 5.1.2 内联样式 (Inline Style)
+
+就像 HTML 元素一样，SVG 元素也支持 `style` 属性。
+
+```xml
+<rect x="10" y="10" width="100" height="100" 
+      style="fill: red; stroke: blue; stroke-width: 5;" />
+```
+
+**优点**：
+- 便于 JavaScript 动态操作。
+- 优先级较高。
+
+## 5.1.3 CSS 样式表 (Internal/External CSS)
+
+你可以使用 `<style>` 标签或者外部 CSS 文件来控制 SVG。
+
+```xml
+<svg ...>
+  <style>
+    .my-rect {
+      fill: red;
+      stroke: blue;
+      stroke-width: 5;
+    }
+    .my-rect:hover {
+      fill: orange;
+    }
+  </style>
+  <rect class="my-rect" x="10" y="10" width="100" height="100" />
+</svg>
+```
+
+**优点**：
+- 样式与结构分离。
+- 可以利用 CSS 的伪类（如 `:hover`）实现交互效果。
+- 可以利用 CSS 动画。
+
+### 交互演示：样式优先级
+
+SVG 样式的优先级遵循 CSS 规则：
+`!important` > 内联样式 > ID 选择器 > 类选择器 > 标签选择器 > 表现属性
+
+在下面的演示中，你可以尝试调整各种样式属性，它们最终都会应用到图形上。
+
+<div className="my-8">
+  <StyleDemo />
+</div>
+
+## 5.1.4 最佳实践
+
+- 对于**静态图标**，推荐使用**表现属性**，因为它们自包含，不需要依赖外部 CSS，到处都能用。
+- 对于**Web 应用中的交互图形**，推荐使用 **CSS 类**，这样可以复用样式，且易于维护。
+- 避免过度使用内联 `style`，除非是 JS 动态计算的值。
