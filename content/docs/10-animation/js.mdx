@@ -1,0 +1,67 @@
+---
+title: 10.5 JavaScript 动画 (Web Animations API)
+description: 现代动画的瑞士军刀
+---
+
+如果你需要控制复杂的动画逻辑（如用户交互触发、物理引擎模拟、多元素协同），CSS 和 SMIL 就有点吃力了。这时候，JavaScript 登场。
+
+## 10.5.1 Web Animations API (WAAPI)
+
+这是现代浏览器内置的动画引擎。它允许你在 JS 中控制 CSS 动画。
+
+```javascript
+const element = document.querySelector('.ball');
+
+const animation = element.animate([
+  { transform: 'translateX(0)' },
+  { transform: 'translateX(100px)' }
+], {
+  duration: 1000,
+  iterations: Infinity
+});
+
+// 你可以暂停、播放、反向播放
+animation.pause();
+animation.play();
+animation.reverse();
+```
+
+-   **优点**：性能极好（主线程之外），API 现代。
+-   **缺点**：不支持某些 SVG 特有属性（如 `d` 属性的变形）。
+
+## 10.5.2 动画库 (Animation Libraries)
+
+为了解决 WAAPI 的局限性，很多强大的动画库应运而生：
+
+1.  **GSAP (GreenSock Animation Platform)**：业界的绝对王者。支持所有 SVG 属性（包括 `d` 变形、`drawSVG` 描边动画）。极其强大，但部分高级插件收费。
+2.  **Framer Motion**：React 生态的首选。声明式动画，非常易用。
+3.  **Anime.js**：轻量级，语法简洁。
+
+```javascript
+// GSAP 示例
+gsap.to(".ball", {
+  x: 100,
+  duration: 1,
+  repeat: -1,
+  yoyo: true
+});
+```
+
+## 10.5.3 交互式 SVG (Interactive SVG)
+
+SVG 本质上是 DOM。你可以给每个 `<path>`、`<circle>` 绑定事件监听器。
+
+```javascript
+const path = document.querySelector('path');
+
+path.addEventListener('click', () => {
+  console.log('Clicked!');
+  path.style.fill = 'red';
+});
+
+path.addEventListener('mouseenter', () => {
+  path.style.strokeWidth = 5;
+});
+```
+
+这使得制作交互式地图、图表变得非常简单。

@@ -1,10 +1,8 @@
 {
-  "title": "Part 7: 渐变与图案",
+  "title": "Part 7: Gradients",
   "pages": [
     "index",
-    "1-linear-gradient",
-    "2-radial-gradient",
-    "3-mesh-gradient",
-    "4-patterns"
+    "gradients",
+    "patterns"
   ]
 }

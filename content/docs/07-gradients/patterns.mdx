@@ -1,0 +1,38 @@
+---
+title: 7.4 图案填充
+description: 无限重复的纹理世界
+---
+
+`<pattern>` 是 SVG 中非常强大的功能，它允许你用一个小 SVG 片段作为“瓷砖”，平铺在任何形状上。
+
+## 7.4.1 Pattern 属性详解
+
+这可能是 SVG 中最让人困惑的部分：**坐标系统**。因为 pattern 涉及两个坐标系：
+1.  **图案本身的网格**（patternUnits）：每块瓷砖有多大？
+2.  **图案内容的绘制**（patternContentUnits）：瓷砖里的图案有多大？
+
+### 交互实验：图案实验室
+
+通过这个实验，你可以直观地比较 `userSpaceOnUse`（像素）和 `objectBoundingBox`（百分比）的区别。
+
+<PatternPlayground />
+
+## 7.4.2 两种坐标模式
+
+-   **`userSpaceOnUse`**：以**像素**为单位。
+    -   `patternUnits="userSpaceOnUse"`：`width="20"` 表示 20px 宽的网格。
+    -   **优点**：纹理不会随着物体大小变形（就像 CSS background-repeat）。
+    -   **适用**：斜线纹理、点阵背景。
+
+-   **`objectBoundingBox`**：以**百分比**（0~1）为单位。
+    -   `patternUnits="objectBoundingBox"`：`width="0.2"` 表示物体宽度的 20%。
+    -   **缺点**：纹理会随着物体拉伸变形。
+    -   **适用**：需要根据物体尺寸自适应的图案（如棋盘格）。
+
+### 最佳实践
+
+通常我们会使用：
+1.  `patternUnits="userSpaceOnUse"`：确保网格大小固定（如 20px）。
+2.  `patternContentUnits="userSpaceOnUse"`：确保图案内容大小固定。
+
+这样无论你的矩形是 100x100 还是 500x200，斜线纹理的密度和角度都不会变。

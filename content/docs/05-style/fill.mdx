@@ -1,0 +1,58 @@
+---
+title: 5.2 填充（Fill）
+description: 颜色、透明度与规则
+---
+
+`fill` 属性定义了 SVG 形状的内部颜色。默认情况下，所有形状（除了 `<line>`）都是实心的。
+
+## 5.2.1 颜色值
+
+SVG 支持所有的 CSS 颜色值：
+
+1.  **关键词**：`red`, `blue`, `transparent`。
+2.  **Hex**：`#ff0000`, `#f00`。
+3.  **RGB/RGBA**：`rgb(255, 0, 0)`, `rgba(255, 0, 0, 0.5)`。
+4.  **HSL/HSLA**：`hsl(0, 100%, 50%)`。
+5.  **CurrentColor**：这是一个极其强大的关键词。它让 SVG 的 `fill` 自动继承父元素的 `color` 属性。
+
+### 实战：使用 currentColor
+
+```css
+.button {
+  color: blue;
+}
+.button:hover {
+  color: red;
+}
+```
+
+```html
+<div class="button">
+  <span>点击我</span>
+  <svg class="icon" fill="currentColor">
+    <path d="..." />
+  </svg>
+</div>
+```
+
+当你悬停在按钮上时，图标会自动变成红色，不需要专门写 `.button:hover svg { fill: red }`。
+
+## 5.2.2 `fill-opacity`
+
+`fill-opacity` 属性专门控制填充颜色的透明度，而不影响描边（stroke）。
+
+```xml
+<circle fill="red" fill-opacity="0.5" stroke="black" stroke-opacity="1" />
+```
+-   如果你使用 `opacity="0.5"`，整个圆（包括描边）都会变半透明。
+-   如果你只想要半透明的填充，必须使用 `fill-opacity`。
+
+## 5.2.3 `fill: none`
+
+如果你想画一个只有边框的圆，必须显式设置 `fill="none"`。
+
+```xml
+<circle r="40" fill="none" stroke="black" />
+```
+
+-   **注意**：`fill="none"` 的区域是**无法响应鼠标事件**的（除非设置 `pointer-events: visible`）。如果你希望用户点击圆圈内部也能触发点击事件，应该设置 `fill="transparent"` 或 `fill-opacity="0"`。

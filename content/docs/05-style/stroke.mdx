@@ -1,0 +1,52 @@
+---
+title: 5.3 描边（Stroke）
+description: 描边属性全家桶
+---
+
+描边（Stroke）是 SVG 样式的核心，它的参数比填充要丰富得多。
+
+## 5.3.1 Stroke 属性交互实验
+
+这个实验涵盖了描边最常用的 5 个属性：`stroke-width`（宽度）、`stroke-linecap`（端点）、`stroke-linejoin`（转角）、`stroke-dasharray`（虚线）和 `stroke-dashoffset`（虚线偏移）。
+
+<StrokePlayground />
+
+## 5.3.2 描边颜色与宽度
+
+```xml
+<path d="..." stroke="black" stroke-width="2" />
+```
+
+-   **默认行为**：
+    -   `stroke: none`（不可见）。
+    -   `stroke-width: 1`（如果设置了 stroke）。
+-   **单位**：通常是像素（px），也可以是百分比、em 等。
+-   **位置**：描边是**居中**在路径上的。如果你画一个 100x100 的矩形，描边宽度为 10，那么你会看到外框变成了 105x105（因为 5px 在内，5px 在外）。
+
+## 5.3.3 端点与转角
+
+-   **`stroke-linecap`**：决定线条**端点**的形状。
+    -   `butt`（默认）：平头，精确在端点截断。
+    -   `round`：圆头，超出端点半个线宽。
+    -   `square`：方头，超出端点半个线宽。
+-   **`stroke-linejoin`**：决定线条**折角**的形状。
+    -   `miter`（默认）：尖角。
+    -   `round`：圆角。
+    -   `bevel`：切角（平头）。
+
+### 注意：MiterLimit
+
+当两条线夹角非常小时，尖角（miter）可能会伸得非常长。为了避免这种情况，SVG 提供了 `stroke-miterlimit` 属性。当尖角长度超过限制时，会自动退化为 `bevel`（切角）。
+
+## 5.3.4 虚线与动画
+
+`stroke-dasharray` 定义了虚线的模式。
+
+-   `5`：5px 实线，5px 空白，5px 实线...
+-   `5, 10`：5px 实线，10px 空白，5px 实线...
+-   `5, 5, 1, 5`：更复杂的模式。
+
+`stroke-dashoffset` 定义了虚线的**起始偏移量**。这正是经典的“描边动画”原理：
+1.  设置 `stroke-dasharray` 为路径总长度。
+2.  设置 `stroke-dashoffset` 为路径总长度（此时整条线都被推到看不见的地方了）。
+3.  通过 CSS 动画将 `stroke-dashoffset` 变为 0（线条慢慢“画”出来）。

@@ -1,0 +1,26 @@
+---
+title: 第十部分：动画与交互
+description: 让图形动起来
+---
+
+SVG 是一种活的格式。与 PNG 或 JPG 不同，SVG 内部的每一个元素都是独立的 DOM 节点，这意味着我们可以像操作 HTML 一样让它动起来。
+
+## 本章概览
+
+1.  **三大动画流派**：CSS、SMIL (SVG 原生)、JavaScript (Web Animations API)。
+2.  **CSS 动画**：最简单，适合 UI 交互。
+3.  **SMIL 动画**：最强大，适合路径变形。
+4.  **JS 动画**：最灵活，适合复杂逻辑。
+
+## 10.1 动画方法对比实验室
+
+同一个“移动的小球”，可以用三种完全不同的代码实现。在这里直观地对比它们的语法差异。
+
+<AnimationPlayground />
+
+## 10.2 哪种方法最好？
+
+-   **简单位移/变色**：首选 **CSS**。性能好，语法熟悉。
+-   **路径变形 (Morphing)**：首选 **SMIL** 或 **JS (GSAP)**。CSS 无法处理路径数据的插值。
+-   **沿着路径运动**：首选 **SMIL (`<animateMotion>`)** 或 **CSS (`offset-path`)**。
+-   **复杂时间轴**：首选 **JavaScript (GSAP/Motion)**。

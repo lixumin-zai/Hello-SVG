@@ -1,0 +1,49 @@
+---
+title: 3.4 多边形
+description: 从三角形到雷达图
+---
+
+如果你需要绘制一个有多个角的封闭形状（如三角形、五角星、雷达图），`<polygon>` 是你的好朋友。
+
+## 3.4.1 `<polygon>`：自动闭合的折线
+
+它与 `<polyline>` 的唯一区别是：**它会自动连接最后一个点和第一个点**。
+
+```xml
+<polygon points="10,10 90,30 50,90" fill="lime" stroke="purple" stroke-width="5" />
+```
+
+- **`points` 属性**：与 `<polyline>` 一样，都是坐标对序列。
+- **填充规则**：默认使用 `nonzero`（非零缠绕规则）。这在绘制复杂自交形状（如五角星）时非常关键。
+
+### 为什么用 `<polygon>` 而不用 `<polyline>`？
+
+1.  **闭合性**：`<polygon>` 总是封闭的，所以 `fill` 会填充整个内部区域。
+2.  **转角连接**：如果用 `<polyline>` 画三角形，最后一个角（连接点）可能不会是尖角（除非你手动重复第一个点）。`<polygon>` 保证每个角都是尖的。
+
+## 3.4.2 绘制正多边形的数学公式
+
+SVG 没有直接提供 `<triangle>` 或 `<star>` 标签。你需要自己计算坐标。
+
+对于正 N 边形（中心在 `(cx, cy)`，半径 `R`）：
+
+```javascript
+// 第 i 个顶点的坐标 (i 从 0 到 N-1)
+angle = (i * 2 * Math.PI) / N - Math.PI / 2; // 减去 90度是为了让顶点朝上
+x = cx + R * Math.cos(angle);
+y = cy + R * Math.sin(angle);
+```
+
+这就是雷达图（Radar Chart）的基础算法。
+
+## 实战：五角星
+
+五角星是一个特殊的十边形（5 个外顶点，5 个内顶点）。
+
+```xml
+<polygon points="50,5 20,95 95,35 5,35 80,95" fill-rule="evenodd" />
+```
+
+- **`fill-rule`**：这是关键！
+  - `nonzero`（默认）：星星中间是实心的。
+  - `evenodd`：星星中间是空心的（奇偶规则）。

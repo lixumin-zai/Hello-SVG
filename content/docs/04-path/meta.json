@@ -1,0 +1,10 @@
+{
+  "title": "Part 4: Paths",
+  "pages": [
+    "index",
+    "lines",
+    "bezier",
+    "arcs",
+    "fill-rule"
+  ]
+}

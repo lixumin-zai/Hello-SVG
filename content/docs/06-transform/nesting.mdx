@@ -1,0 +1,57 @@
+---
+title: 6.4 嵌套与分组
+description: 机械臂运动学
+---
+
+## 6.4.1 `<g>`：分组
+
+`<g>` 元素（Group）就像 Photoshop 中的图层组。它可以：
+
+1.  **共享样式**：给 `<g>` 设置 `fill="red"`，所有子元素都会变红。
+2.  **共享变换**：给 `<g>` 设置 `transform`，所有子元素都会跟着一起变换。
+3.  **命名空间**：通过 `id` 或 `class` 给组命名，便于 JS 选择。
+
+### 嵌套的魔力
+
+当我们把变换叠加起来时，就能创造出复杂的机械运动。
+
+```xml
+<!-- 肩关节 -->
+<g id="shoulder" transform="rotate(30)">
+  <rect width="100" height="20" fill="gray" /> <!-- 上臂 -->
+  
+  <!-- 肘关节 -->
+  <g id="elbow" transform="translate(100, 0) rotate(-45)">
+    <rect width="80" height="15" fill="silver" /> <!-- 前臂 -->
+    
+    <!-- 腕关节 -->
+    <g id="wrist" transform="translate(80, 0) rotate(20)">
+      <circle r="10" fill="red" /> <!-- 手 -->
+    </g>
+  </g>
+</g>
+```
+
+-   **肩关节旋转**：整个手臂都会动。
+-   **肘关节旋转**：只有前臂和手会动。
+-   **腕关节旋转**：只有手会动。
+
+这正是现代骨骼动画（Skeletal Animation）的基础。
+
+## 6.4.2 坐标系变换实战
+
+在 SVG 中，每一次嵌套 `<g>`，实际上都是建立了一个**新的局部坐标系**。
+
+-   最外层的 `viewBox` 是**世界坐标系**。
+-   每个 `<g>` 内部是**局部坐标系**。
+
+当你在 JS 中获取鼠标位置时，得到的通常是屏幕坐标。你需要把它转换成 SVG 的用户坐标系，这就是 `getScreenCTM()`（Current Transformation Matrix）的作用。
+
+```javascript
+const point = svg.createSVGPoint();
+point.x = e.clientX;
+point.y = e.clientY;
+const svgPoint = point.matrixTransform(svg.getScreenCTM().inverse());
+```
+
+这段代码是所有交互式 SVG（如拖拽、绘图板）的核心。它把屏幕上的点，映射回了被缩放、旋转后的 SVG 内部世界。

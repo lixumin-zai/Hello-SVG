@@ -1,9 +1,9 @@
 {
-  "title": "第一部分：SVG 基础与历史",
+  "title": "Part 1: SVG Basics",
   "pages": [
     "index",
-    "1-origin-and-history",
-    "2-nature-and-positioning",
-    "3-comparison"
+    "history",
+    "nature",
+    "comparison"
   ]
 }

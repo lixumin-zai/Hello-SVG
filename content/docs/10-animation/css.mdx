@@ -1,0 +1,60 @@
+---
+title: 10.3 CSS 动画与交互
+description: 最简单的动画方式
+---
+
+如果你熟悉 CSS `@keyframes`，你已经掌握了 80% 的 SVG 动画。
+
+## 10.3.1 基础位移
+
+```css
+.ball {
+  animation: move 2s infinite alternate;
+}
+
+@keyframes move {
+  from { transform: translateX(0); }
+  to { transform: translateX(100px); }
+}
+```
+
+-   **注意：`transform-box`**
+    在 SVG 中，`transform` 默认是相对于**视口（ViewBox）**的。如果你想让一个矩形绕着**它自己的中心**旋转，你必须设置：
+    `transform-box: fill-box;`
+    `transform-origin: center;`
+
+## 10.3.2 交互伪类
+
+SVG 元素完全支持 `:hover`, `:active`, `:focus`。
+
+```css
+path {
+  fill: blue;
+  transition: fill 0.3s;
+}
+
+path:hover {
+  fill: red;
+}
+```
+
+## 10.3.3 描边动画 (Line Drawing)
+
+这是最惊艳的 SVG 特效。原理我们在 [5.3 节](/docs/05-style/stroke) 提到过。
+
+```css
+.path {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: draw 2s forwards;
+}
+
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+```
+
+### 技巧：如何获取路径长度？
+如果你手写路径，不知道长度是多少，可以用 JS：
+`document.querySelector('path').getTotalLength()`
+或者在 CSS 中直接设一个很大的值（如 5000），通常也有效。

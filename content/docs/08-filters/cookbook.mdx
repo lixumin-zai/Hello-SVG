@@ -1,0 +1,70 @@
+---
+title: 8.4 滤镜实战手册
+description: 常见特效的代码配方
+---
+
+掌握了原语之后，我们来看看如何组合它们来实现一些经典的视觉效果。
+
+## 8.4.1 投影 (Drop Shadow)
+
+虽然有了 `<feDropShadow>`，但了解如何手动实现它有助于理解滤镜链。
+
+1.  **SourceAlpha**：取图形的 Alpha 通道（黑色剪影）。
+2.  **Offset**：偏移剪影。
+3.  **GaussianBlur**：模糊剪影。
+4.  **Blend**：将模糊后的剪影放在原始图形（SourceGraphic）的下面。
+
+```xml
+<filter id="manual-shadow">
+  <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
+  <feOffset dx="3" dy="3" result="shadow" />
+  <feFlood flood-color="black" flood-opacity="0.5" />
+  <feComposite in2="shadow" operator="in" />
+  <feMerge>
+    <feMergeNode />
+    <feMergeNode in="SourceGraphic" />
+  </feMerge>
+</filter>
+```
+
+## 8.4.2 内发光 (Inner Glow)
+
+内发光稍微复杂一点，需要利用 `<feComposite>` 进行遮罩运算。
+
+1.  **SourceAlpha**：取剪影。
+2.  **GaussianBlur**：模糊剪影。
+3.  **Composite (xor)**：用原始剪影减去模糊后的剪影，得到边缘。
+4.  **Composite (in)**：只保留在原始图形内部的部分。
+
+## 8.4.3 毛玻璃效果 (Frosted Glass)
+
+利用 `<feTurbulence>` 和 `<feDisplacementMap>`。
+
+```xml
+<filter id="frosted">
+  <feTurbulence type="fractalNoise" baseFrequency="0.1" numOctaves="3" result="noise" />
+  <feDisplacementMap in="SourceGraphic" in2="noise" scale="10" />
+</filter>
+```
+
+## 8.4.4 液态融合 (Gooey Effect)
+
+这是 CSS Tricks 上最著名的 SVG 滤镜效果。它能让两个靠近的圆形像水银一样融合。
+
+原理：
+1.  **Blur**：先高斯模糊，让边缘变虚。
+2.  **ColorMatrix**：增强 Alpha 通道的对比度。把半透明的边缘要么变成完全透明，要么变成完全不透明。
+
+```xml
+<filter id="gooey">
+  <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+  <feColorMatrix in="blur" mode="matrix" values="
+    1 0 0 0 0
+    0 1 0 0 0
+    0 0 1 0 0
+    0 0 0 18 -7" result="gooey" />
+  <feComposite in="SourceGraphic" in2="gooey" operator="atop"/>
+</filter>
+```
+
+-   `18 -7`：这个魔法数字的意思是：把 Alpha 值乘以 18（变得极大），然后减去 7。这样只有原本 Alpha > 7/18 (约 0.4) 的部分才会显示出来，边缘瞬间变得锐利且粘连。
