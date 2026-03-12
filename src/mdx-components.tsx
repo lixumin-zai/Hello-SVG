@@ -17,6 +17,8 @@ import { PatternPlayground } from './components/demos/gradients/PatternPlaygroun
 import { FilterLab } from './components/demos/filters/FilterLab';
 import { ClipMaskComparator } from './components/demos/clip-mask/ClipMaskComparator';
 import { AnimationPlayground } from './components/demos/animation/AnimationPlayground';
+import { ReusePlayground } from './components/demos/reuse/ReusePlayground';
+import { MarkerLab } from './components/demos/markers/MarkerLab';
 
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
@@ -38,6 +40,8 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     FilterLab,
     ClipMaskComparator,
     AnimationPlayground,
+    ReusePlayground,
+    MarkerLab,
     ...components,
   };
 }

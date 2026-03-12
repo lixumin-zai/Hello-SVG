@@ -1,0 +1,37 @@
+---
+title: 11.2 Symbol 与 Sprite
+description: 现代图标系统的核心
+---
+
+## 11.2.1 `<symbol>`：高级版 Group
+
+`<symbol>` 类似于 `<g>`（分组），但它有两个关键特性：
+1.  **不会直接渲染**：就像在 `<defs>` 里一样。
+2.  **拥有自己的 `viewBox`**：这非常重要！
+
+这意味着 `<symbol>` 可以作为一个独立的坐标系组件。
+
+```xml
+<symbol id="icon-home" viewBox="0 0 24 24">
+  <path d="..." />
+</symbol>
+```
+
+当你 `<use>` 一个 symbol 时，你可以给 `<use>` 设置 `width` 和 `height`，浏览器会自动根据 symbol 的 `viewBox` 进行缩放（就像 `<svg>` 嵌套一样）。
+
+```xml
+<use href="#icon-home" width="50" height="50" />
+```
+
+## 11.2.2 SVG Sprite 技术
+
+这是目前 Web 图标的主流方案。
+
+1.  把所有图标打包到一个 SVG 文件中，每个图标包在 `<symbol>` 里。
+2.  在页面顶部内联引入这个 SVG（通常隐藏）。
+3.  在需要图标的地方写 `<svg><use href="#icon-name" /></svg>`。
+
+### 优点
+-   **HTTP 请求少**：只需加载一次。
+-   **灵活**：可以随意用 CSS 控制大小和颜色。
+-   **缓存**：如果作为外部文件引用（`<use href="sprite.svg#icon-home" />`），浏览器可以缓存。

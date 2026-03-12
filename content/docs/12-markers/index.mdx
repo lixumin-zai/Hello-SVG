@@ -1,0 +1,47 @@
+---
+title: 第十二部分：标记（Markers）
+description: 给线条加上箭头
+---
+
+SVG 提供了一种专门的机制来给线条（line, path, polyline）的端点添加装饰，最常见的就是**箭头**。
+
+## 本章概览
+
+1.  **`<marker>` 元素**：定义标记的形状。
+2.  **应用属性**：`marker-start`, `marker-mid`, `marker-end`。
+3.  **方向控制**：`orient="auto"` 的魔法。
+
+## 12.1 标记实验室
+
+箭头方向反了？位置不对？在这里调试你的 Marker。
+
+<MarkerLab />
+
+## 12.2 定义 Marker
+
+```xml
+<defs>
+  <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+    <path d="M0,0 L0,10 L10,5 z" fill="red" />
+  </marker>
+</defs>
+```
+
+-   **`markerWidth/Height`**：标记的视口大小。
+-   **`refX/refY`**：**参考点（枢轴点）**。这是标记与线条连接的点。
+    -   如果你的箭头尖端在 (10, 5)，你应该设 `refX="10" refY="5"`，这样尖端才会正好抵住线头。
+-   **`orient`**：
+    -   `auto`：标记会自动旋转，使其 X 轴与线条切线方向一致。这是画箭头的关键。
+    -   `auto-start-reverse`：起点的标记旋转 180 度。这允许你用同一个箭头定义同时做起点（向左）和终点（向右）。
+
+## 12.3 应用 Marker
+
+```xml
+<path d="..." 
+  marker-start="url(#arrow)" 
+  marker-mid="url(#dot)" 
+  marker-end="url(#arrow)" 
+/>
+```
+
+-   **`marker-mid`**：会应用到路径的每一个中间节点（顶点）。常用于绘制数据点折线图。

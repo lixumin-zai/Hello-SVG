@@ -44,7 +44,7 @@ export function RasterVsVector() {
             step="0.1"
             value={zoom}
             onChange={(e) => setZoom(parseFloat(e.target.value))}
-            className="w-32 accent-primary"
+            className="w-32 h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
           />
         </div>
       </div>
