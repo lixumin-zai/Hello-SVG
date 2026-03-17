@@ -148,7 +148,7 @@ ${stopNodes}
                     min="0" max="100" 
                     value={stop.offset} 
                     onChange={(e) => updateStop(i, 'offset', Number(e.target.value))}
-                    className="w-16 h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                    className="w-16 accent-primary"
                   />
                   <span className="w-8 text-right font-mono">{stop.offset}%</span>
                   
@@ -164,7 +164,7 @@ ${stopNodes}
                     min="0" max="1" step="0.1"
                     value={stop.opacity} 
                     onChange={(e) => updateStop(i, 'opacity', Number(e.target.value))}
-                    className="w-12 h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                    className="w-12 accent-primary"
                   />
                   <span className="w-8 text-right font-mono">Op:{stop.opacity}</span>
 

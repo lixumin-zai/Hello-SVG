@@ -17,7 +17,7 @@ export function Viewer({ svgCode }: ViewerProps) {
     const [zoom, setZoom] = useState(100);
 
     const processedContent = useMemo(() => {
-        if (!svgCode || !svgCode.trim().startsWith('<svg')) {
+        if (!svgCode || (!svgCode.includes('<svg') && !svgCode.includes('<SVG'))) {
             return {
                 type: 'error',
                 content: 'No valid SVG tag found'
@@ -151,7 +151,7 @@ export function Viewer({ svgCode }: ViewerProps) {
                                 step="1"
                                 value={zoom}
                                 onChange={(e) => setZoom(Number(e.target.value))}
-                                className="w-24 accent-indigo-500 mx-1 cursor-pointer"
+                                className="w-24 h-1.5 bg-muted rounded-lg appearance-none cursor-pointer accent-indigo-500 mx-1"
                             />
                             <button onClick={handleZoomReset} className="px-2 text-xs font-medium text-zinc-600 dark:text-zinc-300 min-w-[3rem] text-center hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded transition">{zoom}%</button>
                             <button onClick={handleZoomIn} className="p-1 text-zinc-500 hover:bg-white dark:hover:bg-zinc-800 rounded-md transition-colors"><ZoomIn className="w-4 h-4" /></button>

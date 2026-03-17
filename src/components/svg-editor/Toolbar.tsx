@@ -7,7 +7,8 @@ import {
     Code2,
     Image as ImageIcon,
     Check,
-    Loader2
+    Loader2,
+    Play
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -18,6 +19,7 @@ interface ToolbarProps {
 
 export function Toolbar({ svgCode, setSvgCode }: ToolbarProps) {
     const [copied, setCopied] = useState(false);
+    const [isStreaming, setIsStreaming] = useState(false);
     const [isOptimizing, setIsOptimizing] = useState(false);
 
     const handleCopy = async () => {
@@ -76,20 +78,41 @@ export function Toolbar({ svgCode, setSvgCode }: ToolbarProps) {
         img.src = url;
     };
 
-    const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const result = event.target?.result;
-            if (typeof result === 'string') {
-                setSvgCode(result);
+        setSvgCode('');
+        setIsStreaming(true);
+
+        try {
+            const stream = file.stream();
+            const reader = stream.getReader();
+            const decoder = new TextDecoder();
+            
+            let result = '';
+            
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                
+                const chunk = decoder.decode(value, { stream: true });
+                
+                // Simulate streaming by breaking chunk into smaller pieces
+                // because local file read is usually too fast to see the effect
+                const chunkSize = 50; 
+                for (let i = 0; i < chunk.length; i += chunkSize) {
+                    result += chunk.slice(i, i + chunkSize);
+                    setSvgCode(result);
+                    await new Promise(r => setTimeout(r, 10));
+                }
             }
-        };
-        reader.readAsText(file);
-        // Reset input so the same file can be uploaded again if needed
-        e.target.value = '';
+        } catch (error) {
+            console.error('Error streaming file:', error);
+        } finally {
+            setIsStreaming(false);
+            e.target.value = '';
+        }
     };
 
     const handleOptimize = async () => {
@@ -104,6 +127,28 @@ export function Toolbar({ svgCode, setSvgCode }: ToolbarProps) {
             alert("Failed to optimize SVG. Please make sure svgo is installed.");
         } finally {
             setIsOptimizing(false);
+        }
+    };
+
+    const handleDemoStream = async () => {
+        if (isStreaming || !svgCode) return;
+        
+        const codeToStream = svgCode;
+
+        setSvgCode('');
+        setIsStreaming(true);
+
+        try {
+            let current = '';
+            // Chunk size simulates typing speed
+            const chunkSize = 3; 
+            for (let i = 0; i < codeToStream.length; i += chunkSize) {
+                current += codeToStream.slice(i, i + chunkSize);
+                setSvgCode(current);
+                await new Promise(r => setTimeout(r, 15));
+            }
+        } finally {
+            setIsStreaming(false);
         }
     };
 
@@ -122,11 +167,29 @@ export function Toolbar({ svgCode, setSvgCode }: ToolbarProps) {
                 </div>
                 <div>
                     <h2 className="font-bold text-zinc-800 dark:text-zinc-100 leading-tight">SVG Renderer</h2>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">Real-time vector graphics</p>
+                    <div className="flex items-center gap-2">
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">Real-time vector graphics</p>
+                        {isStreaming && (
+                            <span className="flex items-center gap-1 text-xs font-medium text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-0.5 rounded-full">
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                                Streaming...
+                            </span>
+                        )}
+                    </div>
                 </div>
             </div>
 
             <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 w-full sm:w-auto justify-end custom-scrollbar">
+
+                <button
+                    onClick={handleDemoStream}
+                    disabled={isStreaming}
+                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20 rounded-xl transition-all disabled:opacity-50"
+                    title="Simulate Stream Load"
+                >
+                    <Play className="w-4 h-4" />
+                    <span className="hidden lg:inline">Stream</span>
+                </button>
 
                 <button
                     onClick={handleOptimize}

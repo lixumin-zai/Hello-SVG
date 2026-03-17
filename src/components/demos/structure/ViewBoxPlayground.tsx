@@ -59,7 +59,7 @@ export function ViewBoxPlayground() {
                   max="150"
                   value={viewBoxY}
                   onChange={(e) => setViewBoxY(Number(e.target.value))}
-                  className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                  className="w-full accent-primary"
                 />
               </div>
               <div className="space-y-1">
@@ -70,7 +70,7 @@ export function ViewBoxPlayground() {
                   max="200"
                   value={viewBoxW}
                   onChange={(e) => setViewBoxW(Number(e.target.value))}
-                  className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                  className="w-full accent-primary"
                 />
               </div>
               <div className="space-y-1">
@@ -81,7 +81,7 @@ export function ViewBoxPlayground() {
                   max="200"
                   value={viewBoxH}
                   onChange={(e) => setViewBoxH(Number(e.target.value))}
-                  className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+                  className="w-full accent-primary"
                 />
               </div>
             </div>
