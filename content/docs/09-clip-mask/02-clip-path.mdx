@@ -1,0 +1,40 @@
+---
+title: '9.2 裁剪路径 (clipPath)'
+description: '使用 clipPath 像剪刀一样裁剪图形'
+icon: 'Crop'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+## 什么是 clipPath？
+
+`<clipPath>` 就像一把锋利的剪刀。你用剪刀剪出一个星星形状的纸板，然后盖在照片上。星星形状以内的部分 100% 显示，以外的部分 100% 隐藏。
+
+*   **特性**：二元逻辑，非黑即白（要么显示，要么不显示）。
+*   **忽略外观**：不管你在 `<clipPath>` 里画的星星是什么颜色、是否半透明，统统无效！它只关心图形的**几何边界**。
+*   **性能**：因为只做几何计算不涉及像素混合，渲染性能极高。
+*   **使用场景**：简单的头像裁剪、基础几何形状裁剪。
+
+## 基本用法
+
+```xml
+<svg viewBox="0 0 200 200">
+  <defs>
+    <!-- 1. 定义一个 clipPath -->
+    <clipPath id="my-clip">
+      <circle cx="100" cy="100" r="50" />
+    </clipPath>
+  </defs>
+
+  <!-- 2. 应用到图片上 -->
+  <image 
+    href="photo.jpg" 
+    width="200" height="200" 
+    clip-path="url(#my-clip)" 
+  />
+</svg>
+```
+
+<Callout type="info" title="多个形状">
+在 `<clipPath>` 内部，你可以放置多个形状。被裁剪的元素会在这些形状的并集区域内显示。
+</Callout>

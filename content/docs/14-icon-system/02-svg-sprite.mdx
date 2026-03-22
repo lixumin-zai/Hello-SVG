@@ -1,0 +1,49 @@
+---
+title: '14.2 SVG Sprite 精灵图技术'
+description: '使用 <symbol> 和 <use> 构建高性能的 SVG Sprite'
+icon: 'Layers'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { SpriteVisualizer } from '@/components/docs/14-icon-system/sprite/SpriteVisualizer';
+
+在 Web 早期，为了减少图片的 HTTP 请求，我们把几十张小图标拼成一张大图，然后用 `background-position` 来定位，这就是经典的 **CSS Sprite (雪碧图)**。
+
+在 SVG 时代，我们不需要用坐标去艰难地切图了。**SVG Sprite** 利用 `<symbol>` 和 `<use>` 标签，实现了更加优雅、无损缩放的组件化复用。
+
+## 交互探索：SVG Sprite 的工作原理
+
+点击下方的按钮，观察左侧内存中的“图标库”是如何被右侧的 `<use>` 标签调用的。
+
+<SpriteVisualizer />
+
+---
+
+## 为什么要用 `<symbol>` 而不是 `<g>`？
+
+在 [第十部分：复用与组合](/docs/10-reuse/03-symbol) 中我们已经深入探讨过：
+`<symbol>` 的超级魔力在于它**可以自带独立的 `viewBox`**。
+
+当你用 `<use>` 调用一个 `<symbol>` 并给它设置 `width="100"` 时，SVG 会自动根据 `symbol` 内部的 `viewBox` 将图标完美等比缩放进 100x100 的盒子里。如果用 `<g>`，图形只会被生硬地裁剪！
+
+## SVG Sprite 的两种部署模式
+
+### 模式一：Inline Sprite (内联精灵图)
+这也是我们在上面演示的模式。通过 Webpack/Vite 插件（如 `svg-sprite-loader`），在页面加载时把所有图标打包成一个巨大的 `<svg>` 插入到 `<body>` 的最前面。
+- **优点**：没有额外的 HTTP 请求，完全受当前页面的 CSS 控制（完美支持 currentColor）。
+- **缺点**：增加了初始 HTML 的体积，无法被浏览器独立缓存。
+
+### 模式二：External Sprite (外部精灵图)
+把所有图标打包成一个独立的 `icons.svg` 文件存放在 CDN 上。在页面中使用时，`href` 指向外部文件加上 ID：
+
+```xml
+<svg class="icon">
+  <use href="/assets/icons.svg#icon-heart" />
+</svg>
+```
+- **优点**：`icons.svg` 可以被浏览器长期缓存，不阻塞页面渲染。
+- **缺点**：会遇到跨域 (CORS) 问题，且**外部引用的 SVG 无法继承当前页面的 CSS 变量和 currentColor**（除非进行极其复杂的特殊处理）。
+
+<Callout type="warn" title="弃用警告">
+  过去我们常写 <code>&lt;use xlink:href="..."&gt;</code>，现在 <code>xlink</code> 命名空间已被正式废弃。请直接使用 <code>href="..."</code>。
+</Callout>

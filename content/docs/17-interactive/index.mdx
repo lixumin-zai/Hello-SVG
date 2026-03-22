@@ -1,0 +1,32 @@
+---
+title: '17.1 交互式 SVG 概览'
+description: '超越静态图片，把 SVG 变成一个充满活力的 Web 应用'
+icon: 'MousePointer2'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Cards, Card } from 'fumadocs-ui/components/card';
+
+当 SVG 结合了 JavaScript 和 CSS，它就不再只是一张插图，而是一个功能完整的**交互式应用 (Interactive Application)**。
+在许多专业领域（如数据大屏、在线白板、楼宇平面图导航等），SVG 是构建交互层的不二之选。
+
+## 核心交互场景
+
+<Cards>
+  <Card title="画布平移与缩放 (Pan & Zoom)" href="/docs/17-interactive/02-pan-zoom">
+    像 Google Maps 或 Figma 那样，允许用户在无限的画布上自由拖拽和滚轮缩放，这是复杂图形应用的基础。
+  </Card>
+  <Card title="数据绑定与地图交互" href="/docs/17-interactive/03-interactive-maps">
+    将 SVG 的每一个 path 与业务数据绑定，实现悬停高亮、点击下钻、数据联动的沉浸式大屏体验。
+  </Card>
+</Cards>
+
+---
+
+## 交互设计原则
+
+在为 SVG 设计交互时，请牢记以下原则：
+
+1. **善用 `pointer-events`**：这是 SVG 交互的灵魂。如果你想让用户能点中一根极细的线，请在它上面盖一根透明的粗线，并设置 `pointer-events="stroke"`。
+2. **事件委托 (Event Delegation)**：永远不要给 1000 个 `<path>` 单独绑定 `onClick`。把事件绑定在最外层的 `<svg>` 或 `<g>` 上，然后通过 `event.target` 判断。
+3. **视觉反馈**：由于 SVG 元素默认没有焦点或悬停状态的视觉反馈，你必须通过 CSS（如 `:hover` 改变 `fill` 或增加 `stroke-width`）来告诉用户“这个东西是可以点的”。

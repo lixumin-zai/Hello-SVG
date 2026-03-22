@@ -1,0 +1,56 @@
+---
+title: '18.3 键盘导航与焦点管理'
+description: '为无法使用鼠标的用户设计，让 SVG 内部元素支持 Tab 键访问'
+icon: 'Keyboard'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { FocusVisualizer } from '@/components/docs/18-accessibility/keyboard/FocusVisualizer';
+
+如果你的 SVG 仅仅是用来“看”的，那么做好上一节的 `<title>` 和 `<desc>` 就足够了。
+但如果你的 SVG 内部包含了**可以点击的交互元素**（比如流程图中的节点、地图上的省份），你必须确保用户不使用鼠标也能操作它们！
+
+## 交互探索：使用 Tab 键“点”图
+
+请用鼠标点击下方的虚线框区域以获取焦点，然后**放下鼠标，只使用键盘上的 `Tab` 键和 `Enter` 键**，看看你能否触发 A 和 B 节点的操作。
+
+<FocusVisualizer />
+
+---
+
+## 实现键盘交互的核心步骤
+
+普通的 `<path>` 或 `<g>` 是无法获得焦点的，你需要像对待 HTML 的 `<div>` 一样对它们进行改造：
+
+### 1. 赋予焦点能力：`tabindex="0"`
+给需要交互的 SVG 元素加上 `tabindex="0"`，这样当用户按 Tab 键时，浏览器的焦点光标就能跳到这个元素上。
+
+### 2. 赋予语义角色：`role="button"`
+虽然它能被选中了，但屏幕阅读器不知道它是个啥。加上 `role="button"`（或 `link`），并用 `aria-label` 告诉用户它的功能。
+
+### 3. 提供可见的焦点样式：`:focus-visible`
+这是最容易被遗漏的一步！当元素获得焦点时，必须在视觉上给出明显的反馈（比如一圈高亮的描边）。
+在 CSS 中使用 `:focus-visible` 伪类，确保只在键盘导航时显示边框，而不会影响鼠标点击的体验。
+
+```css
+/* 针对 SVG 元素的焦点样式 */
+.interactive-node:focus-visible {
+  outline: none; /* 移除浏览器默认的方形外框 */
+  stroke: #3b82f6; /* 改用 SVG 原生的描边来做高亮 */
+  stroke-width: 4px;
+}
+```
+
+### 4. 绑定键盘事件：`onKeyDown`
+你给元素绑定了 `onClick`（鼠标点击），但**键盘的 Enter 键和空格键默认不会触发 SVG 元素的 click 事件**（只有原生的 `<button>` 才有这个待遇）。
+因此，你必须显式地监听键盘事件：
+
+```javascript
+element.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault(); // 阻止空格键导致页面向下滚动
+    // 执行和 onClick 一样的业务逻辑
+    handleClick();
+  }
+});
+```

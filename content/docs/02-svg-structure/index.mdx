@@ -1,0 +1,66 @@
+---
+title: '2.1 SVG 文件剖析'
+description: '深入理解 SVG 的基本结构，特别是极其重要但常常令人困惑的 viewBox 属性'
+icon: 'FileCode'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { ViewBoxPlayground } from '@/components/docs/02-svg-structure/index/ViewBoxPlayground';
+
+一个 SVG 文件本质上就是一个 XML 文档。了解它的基本结构和坐标系统，是掌握 SVG 的第一步。
+
+## 基本结构
+
+下面是一个最基础的 SVG 文件示例：
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <rect x="50" y="50" width="100" height="100" fill="blue" />
+</svg>
+```
+
+### 1. XML 声明
+第一行是 XML 声明，告诉解析器这是一个 XML 1.0 文档，编码为 UTF-8。如果你是将 SVG 内联（Inline）写在 HTML5 文档中，**这一行可以省略**。
+
+### 2. `<svg>` 根元素
+它是所有 SVG 绘图的容器。必须包含 `xmlns="http://www.w3.org/2000/svg"` 命名空间声明（内联在 HTML5 中时现代浏览器会自动处理，但为了兼容性和作为独立文件时，**强烈建议保留**）。
+
+## SVG 的两套坐标系统
+
+初学者最容易在 SVG 中遇到的坑，就是搞混了 `width/height` 和 `viewBox`。实际上，SVG 内部存在两套独立的坐标系统。
+
+### 1. 视口 (Viewport) —— 外在的“窗户”
+`<svg>` 元素的 `width` 和 `height` 属性定义了**视口**。它就像你在墙上开的一扇窗户，决定了你在网页上能看到多大面积的景色。它的单位通常是物理像素。
+
+### 2. 用户坐标系 (viewBox) —— 内在的“世界”
+`viewBox` 属性定义了 SVG 内部自己的坐标世界。它有四个值：`min-x`, `min-y`, `width`, `height`。
+它决定了窗户内部的“景色”是如何缩放、平移来适应这扇窗户的。
+
+<Callout type="warn" title="为什么图形被截断或变形了？">
+  当你发现 SVG 图形显示不全、变得很小或者很大时，99% 的原因是因为 <b>Viewport 的宽高比例</b> 与 <b>viewBox 的宽高比例</b> 不一致。
+</Callout>
+
+## 可视化：理解 ViewBox
+
+为了彻底弄懂这个概念，请动手操作下面的演示器。
+
+<ViewBoxPlayground />
+
+### 关键结论
+1. **平移 (Pan)**：增加 `min-x` / `min-y` 的值，相当于把内部坐标系向左/向上移动（或者说，把你的"视口窗户"向右/向下移动）。
+2. **缩放 (Zoom)**：
+   - 当 `viewBox` 的宽高 **大于** 视口宽高时，相当于把一个大世界塞进一个小窗户，图形会**缩小**（Zoom out）。
+   - 当 `viewBox` 的宽高 **小于** 视口宽高时，相当于把一个小区域拉伸填满整个窗户，图形会**放大**（Zoom in）。
+
+---
+
+## 坐标系统原点与方向
+
+最后，记住 SVG 坐标系的默认规则（这与 Canvas 和大多数屏幕渲染系统一致，但与我们在数学课上学的笛卡尔坐标系不同）：
+
+*   **原点 (0,0)** 位于左上角。
+*   **X 轴** 正方向向**右**。
+*   **Y 轴** 正方向向**下**（数学系是向上）。
+
+这也意味着，如果你想让一个元素在 SVG 中“下落”，你需要**增加**它的 Y 坐标值。

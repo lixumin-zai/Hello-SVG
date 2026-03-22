@@ -1,0 +1,47 @@
+---
+title: '22.1 SVG 的黑暗面：安全性概览'
+description: '允许用户上传 SVG 是极其危险的！了解 SVG 在 Web 安全中的致命威胁'
+icon: 'ShieldAlert'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Cards, Card } from 'fumadocs-ui/components/card';
+
+普通的图片格式（JPG、PNG、WebP）仅仅是像素的集合，它们本身不具备任何执行能力。
+但我们在前面的章节中反复强调过：**SVG 是 XML，它是可以包含 `<script>` 标签和事件处理器的！**
+
+这意味着，**一个看似无害的 `.svg` 文件，可能就是一个伪装的恶意程序。** 如果你的网站允许用户上传自定义头像（且支持 SVG 格式），如果不做任何处理，你可能正在向所有的用户分发 XSS（跨站脚本攻击）炸弹。
+
+## SVG 的三大安全威胁
+
+<Cards>
+  <Card title="1. XSS (跨站脚本攻击)" href="/docs/22-security/02-xss">
+    攻击者在 SVG 中嵌入恶意 JavaScript，窃取当前站点的用户 Cookie、Session 或执行未授权操作。
+  </Card>
+  <Card title="2. SSRF & 信息泄露" description="通过 SVG 内部的 <image href='...'> 或 <style> 标签，强迫服务器或用户的浏览器向内网或攻击者的服务器发起请求（Pingback）。" />
+  <Card title="3. Billion Laughs 攻击 (XML 炸弹)" description="利用 XML 的实体扩展功能，用几十行代码定义递归嵌套，在解析时消耗几 GB 内存，导致服务器或浏览器直接崩溃 (DoS 攻击)。" />
+</Cards>
+
+---
+
+## 防御与消毒 (Sanitization)
+
+如果你**必须**接受并展示用户上传的 SVG，你不能仅仅依靠前端正则匹配。你必须在服务端使用专门的 XML/SVG 解析器进行**深度消毒 (Sanitization)**。
+
+业界标准的解决方案是使用像 **[DOMPurify](https://github.com/cure53/DOMPurify)** 这样的库。
+
+```javascript
+import DOMPurify from 'dompurify';
+
+// 假设 dirtySVG 是用户上传的字符串
+const cleanSVG = DOMPurify.sanitize(dirtySVG, {
+  USE_PROFILES: { svg: true }, // 开启 SVG 模式
+  FORBID_TAGS: ['foreignObject'], // 根据业务需求，禁用极度危险的标签
+});
+```
+
+**消毒的核心原则：**
+1. 移除所有的 `<script>` 标签。
+2. 移除所有以 `on` 开头的事件属性（如 `onload`, `onclick`）。
+3. 移除包含 `javascript:` 伪协议的 `href` 属性（如 `<a href="javascript:alert(1)">`）。
+4. （可选但推荐）禁用 `<foreignObject>`，因为它里面可以放任意 HTML。

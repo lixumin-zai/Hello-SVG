@@ -1,0 +1,51 @@
+---
+title: '15.2 SVGO 自动化优化'
+description: '利用行业标准工具 SVGO 彻底清洗 SVG 代码'
+icon: 'Wrench'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { SvgoVisualizer } from '@/components/docs/15-optimization/svgo/SvgoVisualizer';
+
+**SVGO (SVG Optimizer)** 是目前最强大、使用最广泛的 Node.js 基础 SVG 优化工具。无论是 Webpack 的 `svgo-loader`、Vite 插件，还是在线工具 SVGOMG，底层都是基于它。
+
+## 交互探索：SVGO 到底做了什么？
+
+请看下方从 Adobe Illustrator 导出的一个简单红三角。点击优化按钮，看看 SVGO 是如何把 395 字节的臃肿代码精简到 95 字节的！
+
+<SvgoVisualizer />
+
+---
+
+## 核心优化插件解析
+
+SVGO 采用插件化架构，默认开启了许多安全且高效的插件：
+
+1. **`removeDoctype` / `removeXMLProcInst`**：
+   在 HTML5 页面中内联 SVG 时，XML 声明 (`<?xml ...?>`) 和 Doctype 完全是废话，直接删掉。
+2. **`removeComments` / `removeMetadata`**：
+   删除设计软件悄悄塞进去的版本信息、版权声明等注释。
+3. **`removeEmptyGroups` / `collapseGroups`**：
+   设计软件经常生成一堆毫无意义的空 `<g>` 标签，或者只有一个子元素的 `<g>`。SVGO 会把它们拍平。
+4. **`convertPathData` (最核心！)**：
+   - 把相对坐标和绝对坐标相互转换，选更短的那个。
+   - 删除多余的空格（比如把 `M 10 20` 变成 `M10 20`）。
+   - 四舍五入极长的小数点（比如把 `10.000001` 变成 `10`）。
+5. **`convertStyleToAttrs`**：
+   把 `<style>` 里的类名样式转换回简单的表现属性（如 `fill="red"`），不仅省空间，还能避免全局 CSS 污染！
+
+<Callout type="warn" title="危险的插件警告！">
+  有些 SVGO 插件在默认情况下是关闭的（比如 `removeUnknownsAndDefaults` 或 `cleanupIDs`）。
+  如果你在 SVG 中使用了自定义的 `data-*` 属性用于 JS 交互，或者你的 SVG Sprite 依赖于特定的 ID，盲目开启深度清理可能会**破坏你的业务逻辑**！一定要仔细配置 `svgo.config.js`。
+</Callout>
+
+## 如何在项目中使用
+
+最简单的独立使用方式是全局安装 SVGO CLI：
+
+```bash
+npm install -g svgo
+svgo logo.svg -o logo.min.svg
+```
+
+如果你只是偶尔优化几个文件，强烈推荐使用在线可视化版本：[SVGOMG](https://jakearchibald.github.io/svgomg/)。

@@ -1,0 +1,30 @@
+---
+title: '23.1 SVG 实战案例概览'
+description: '纸上得来终觉浅，绝知此事要躬行。综合运用所学知识构建真实项目。'
+icon: 'Hammer'
+---
+
+import { Cards, Card } from 'fumadocs-ui/components/card';
+
+在前面二十二个章节中，我们把 SVG 的每一个标签、每一个属性、每一种 API 以及安全和优化策略都掰开揉碎了进行讲解。
+
+但这就像是学习了所有的英语单词和语法，并不代表你能立刻写出一篇优美的文章。在实际的前端工程中，SVG 往往是作为底层渲染引擎，与 React/Vue、数据状态管理、交互事件系统深度结合在一起的。
+
+## 实战项目导航
+
+为了帮助你将碎片化的知识融会贯通，本章提供了三个极具代表性的企业级实战案例拆解：
+
+<Cards>
+  <Card title="实战一：交互式数据大屏" href="/docs/23-projects/02-dashboard">
+    **涉及知识点**：坐标系转换、路径生成算法、CSS 动画、渐变填充。
+    **场景**：大厂必备的实时监控大屏，使用 D3.js 配合 React 构建高性能图表。
+  </Card>
+  <Card title="实战二：企业级图标系统" href="/docs/23-projects/03-icon-system">
+    **涉及知识点**：SVG Sprite (`<symbol>`)、`currentColor`、SVGO 自动化。
+    **场景**：为你的团队搭建一套像 Ant Design 那样好用的、支持按需加载的图标组件库。
+  </Card>
+  <Card title="实战三：简易矢量画板" href="/docs/23-projects/04-editor">
+    **涉及知识点**：DOM API (`getBBox`, `getScreenCTM`)、事件绑定、坐标逆变换。
+    **场景**：实现一个可以通过鼠标拖拽来绘制和移动矩形、圆形的在线小画板。
+  </Card>
+</Cards>

@@ -1,0 +1,9 @@
+{
+  "title": "第十三部分：SVG 与 JavaScript",
+  "pages": [
+    "index",
+    "02-geometry-api",
+    "03-events-and-interaction",
+    "04-libraries"
+  ]
+}

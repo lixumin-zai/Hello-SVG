@@ -1,0 +1,46 @@
+---
+title: '16.2 ViewBox 驱动的响应式'
+description: '通过动态改变视口，实现"逻辑层面"的响应式裁剪与展开'
+icon: 'Maximize'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { ResponsiveViewBoxVisualizer } from '@/components/docs/16-responsive/viewbox/ResponsiveViewBoxVisualizer';
+
+在[第二部分](/docs/02-svg-structure/index)我们讲过，`viewBox` 就像是拿着一个摄像机看画。
+响应式不仅是把摄像机拉近拉远，还可以是**改变摄像机的取景框大小**。
+
+## 交互探索：动态 ViewBox
+
+试着拖动下方的滑块改变外层容器的宽度。注意观察当容器变宽时，SVG 并不是简单地被拉长，而是通过改变 `viewBox`，**露出了原本在视口之外的更多细节**（文字和绿点）。
+
+<ResponsiveViewBoxVisualizer />
+
+---
+
+## 实现原理：不写死宽高
+
+要让 SVG 具有流体响应能力，第一原则是：**永远不要在 `<svg>` 标签上写死固定的 `width` 和 `height`**（除非你在用 Sprite 图标）。
+
+```xml
+<!-- ❌ 坏的实践：写死尺寸，无法响应式 -->
+<svg width="500" height="300" viewBox="0 0 500 300">...</svg>
+
+<!-- ✅ 好的实践：只写 viewBox，尺寸交由外部 CSS 容器控制 -->
+<svg viewBox="0 0 500 300" class="w-full h-auto">...</svg>
+```
+
+当你只保留 `viewBox` 时，SVG 就像是一个充满弹性的气球，它会试图填满外部提供给它的任何容器（比如一个 `<div>`），同时根据默认的 `preserveAspectRatio="xMidYMid meet"` 保持自己的长宽比。
+
+## preserveAspectRatio 的响应式应用
+
+如果你希望 SVG 像 CSS 的 `object-fit: cover` 一样，在任何比例的屏幕下都铺满整个背景，并且裁剪掉多余的部分：
+
+```xml
+<!-- 强制铺满容器，裁剪掉溢出的部分，并且以中心对齐 -->
+<svg viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  ...
+</svg>
+```
+
+这在制作全屏波浪背景、动态天空等装饰性背景时极其有用。

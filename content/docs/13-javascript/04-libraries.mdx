@@ -1,0 +1,86 @@
+---
+title: '13.5 SVG 数据可视化库生态'
+description: '站在巨人的肩膀上：主流基于 SVG 的可视化与动画库盘点'
+icon: 'BarChart'
+---
+
+import { Cards, Card } from 'fumadocs-ui/components/card';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+虽然直接使用原生的 SVG DOM API 可以实现任何效果，但在实际的企业级开发中，我们通常会借助成熟的第三方库来处理复杂的数学计算、状态映射和动画过渡。
+
+以下是现代 Web 生态中最核心的基于 SVG 的可视化和操作库：
+
+---
+
+## 1. 可视化之王：D3.js
+
+**D3 (Data-Driven Documents)** 是 Web 数据可视化领域绝对的统治者。它不是一个开箱即用的图表库，而是一个底层的“可视化构建套件”。
+
+*   **核心理念**：将数据（Data）绑定到 DOM（通常是 SVG 元素）上，并通过数据驱动文档的变换。
+*   **强项**：极其强大的比例尺（Scales）、坐标轴计算、地理投影（Geo）和力导向图计算。
+*   **适用场景**：定制化极高、独一无二的交互式数据大屏或分析工具。
+
+```javascript
+// D3 经典的数据绑定模式 (Enter-Update-Exit)
+d3.select("svg")
+  .selectAll("circle")
+  .data([10, 20, 30])
+  .enter()
+  .append("circle")
+  .attr("r", d => d)
+  .attr("cx", (d, i) => i * 50 + 20)
+  .attr("cy", 50);
+```
+
+---
+
+## 2. 现代框架封装库
+
+由于 D3.js 喜欢自己接管 DOM 的操作（它有自己的一套 select 和 append 逻辑），这在 React / Vue 时代与框架的虚拟 DOM 理念产生了冲突。因此诞生了一批结合了 D3 计算能力和框架渲染能力的库：
+
+<Cards>
+  <Card title="Recharts (React)" href="https://recharts.org/" target="_blank">
+    基于 React 和 D3 构建，采用声明式的组件标签（如 `<LineChart>`, `<XAxis>`）来快速拼装图表，开箱即用，是目前 React 社区最流行的图表库之一。
+  </Card>
+  <Card title="Visx (React)" href="https://airbnb.io/visx/" target="_blank">
+    Airbnb 开源的底层可视化原语库。它把 D3 的计算逻辑剥离出来，把 DOM 渲染权完全交还给 React。如果你觉得 Recharts 太死板，D3 太难学，Visx 是最完美的中间态。
+  </Card>
+</Cards>
+
+---
+
+## 3. 手绘风格：Rough.js
+
+想让你的 SVG 图表看起来像是在白板上用马克笔手绘的吗？**Rough.js** 就是为此而生的。
+它可以通过算法，把规整的 SVG 路径（Path）、矩形、圆形转换为带有随机波动和涂鸦填充效果的手绘风格线条。
+
+它支持 Canvas 和 SVG 两种渲染模式，Excalidraw（著名的在线白板工具）的核心绘图引擎就是基于它实现的。
+
+---
+
+## 4. 动画霸主：GSAP (GreenSock)
+
+虽然 CSS 动画和 WAAPI 能解决大部分问题，但如果涉及复杂的 **SVG 路径变形（Morphing）**、**沿路径运动（Motion Path）** 或 **复杂时间轴同步**，GSAP 是无可争议的行业标准。
+
+<Callout type="tip" title="GSAP 的 SVG 插件三剑客">
+  - **DrawSVGPlugin**：轻松实现 SVG 路径的画线（描边）动画，屏蔽所有浏览器兼容性计算。
+  - **MorphSVGPlugin**：将任意一个形状（如正方形）顺滑地平移渐变（变形）成完全不同的另一个形状（如大象），它在底层帮你计算和对齐所有贝塞尔控制点。
+  - **MotionPathPlugin**：让任何 DOM 元素沿着你画好的 SVG 曲线完美运动。
+</Callout>
+
+```javascript
+// GSAP 路径变形示例
+gsap.to("#circle", {
+  duration: 2, 
+  morphSVG: "#hippo" // 将 id 为 circle 的形状渐变为 id 为 hippo 的形状
+});
+```
+
+---
+
+## 总结
+
+如果你只是需要几个普通的柱状图、折线图，使用 ECharts（基于 Canvas / SVG）或 Recharts 即可。
+如果你的项目需要高度自定义的可视化交互，请学习 **D3.js 的计算模块** 并结合你的前端框架进行渲染。
+如果是极其复杂的炫酷图形动画，直接上 **GSAP** 会为你节省无数个掉头发的夜晚。

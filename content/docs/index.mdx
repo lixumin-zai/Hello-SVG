@@ -1,0 +1,61 @@
+---
+title: 'Hello SVG 全景指南'
+description: '欢迎来到目前 Web 上最全面、最直观、交互最丰富的 SVG 学习平台。'
+icon: 'Sparkles'
+---
+
+import { Cards, Card } from 'fumadocs-ui/components/card';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+# 为什么你需要彻底掌握 SVG？
+
+在当今的前端开发中，HTML 负责结构，CSS 负责样式，JavaScript 负责逻辑。而当你需要绘制**图表、动态图标、复杂背景、甚至是在线白板应用**时，你需要一个专用的渲染引擎。
+
+HTML 和 CSS 无法画出平滑的贝塞尔曲线；Canvas 是一张死板的像素位图，难以响应事件；WebGL 又过于底层和复杂。
+**SVG（可缩放矢量图形）**，作为一种基于 XML 的原生 DOM 标签，是唯一能够完美平衡**矢量高清、可编程性、事件交互与样式定制**的技术。
+
+本指南分为 23 个核心章节，带你从最基础的 `<circle>` 画起，一路深入到矩阵变换、高级滤镜、React 组件化封装，甚至涉及生成艺术与安全防御。
+
+---
+
+## 核心学习路径推荐
+
+如果你时间有限，建议按照以下三条路径进行针对性学习：
+
+### 🎯 路径一：UI / 前端工程师（聚焦日常开发）
+你需要知道如何处理设计师发来的文件，并在 React/Vue 中优雅地使用它们。
+<Cards>
+  <Card title="第二部分：文档结构" href="/docs/02-svg-structure" />
+  <Card title="第五部分：样式与外观" href="/docs/05-style" />
+  <Card title="第十四部分：图标系统" href="/docs/14-icon-system" />
+  <Card title="第十九部分：框架中的使用" href="/docs/19-frameworks" />
+</Cards>
+
+### 📈 路径二：数据可视化开发（聚焦图表与交互）
+你需要精通坐标系转换、曲线生成以及底层的 DOM API。
+<Cards>
+  <Card title="第四部分：路径 (Path)" href="/docs/04-path" />
+  <Card title="第六部分：变换 (Transform)" href="/docs/06-transform" />
+  <Card title="第十三部分：与 JS 交互" href="/docs/13-javascript" />
+  <Card title="第十七部分：交互式 SVG" href="/docs/17-interactive" />
+</Cards>
+
+### 🎨 路径三：图形特效与动画（聚焦视觉表现）
+你想做出令人惊叹的 Web 视觉效果，甚至复刻大厂官网的炫酷动效。
+<Cards>
+  <Card title="第八部分：滤镜 (Filters)" href="/docs/08-filters" />
+  <Card title="第九部分：裁剪与蒙版" href="/docs/09-clip-mask" />
+  <Card title="第十二部分：动画" href="/docs/12-animations" />
+  <Card title="第二十一部分：高级黑魔法" href="/docs/21-advanced" />
+</Cards>
+
+---
+
+## 互动实验室说明
+
+本教程的一大特色是**拒绝干巴巴的代码**。
+在绝大多数章节中，你都会看到类似下方的互动实验室组件。**请务必亲自动手拖拽滑块、点击按钮**，这种所见即所得的视觉反馈，能帮你省去几个小时的死记硬背。
+
+<Callout type="tip" title="准备好了吗？">
+  点击左侧侧边栏，从 [第一部分：SVG 基础与历史](/docs/01-svg-basics) 开始你的 SVG 大师之旅吧！
+</Callout>

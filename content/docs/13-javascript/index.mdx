@@ -1,0 +1,80 @@
+---
+title: '13.1 SVG DOM API 概览'
+description: '了解 SVG 与 JavaScript 交互的基础，掌握原生 SVG DOM 的核心方法。'
+icon: 'Code2'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Cards, Card } from 'fumadocs-ui/components/card';
+
+## SVG 与 JavaScript：天作之合
+
+SVG 是基于 XML 语法的标记语言，当它被嵌入到 HTML 页面中时，浏览器会将其解析为 **SVG DOM（文档对象模型）**。这意味着我们可以像操作普通的 HTML 元素（如 `<div>` 或 `<img>`）一样，使用 JavaScript 来操作 SVG 的任何一个节点。
+
+正是由于这种可编程性，SVG 成为了 Web 数据可视化（如 D3.js）和高级交互图形的基石。
+
+---
+
+## SVG DOM 与 HTML DOM 的差异
+
+虽然它们都属于 DOM，但 SVG DOM 有一些独特的特性和陷阱。
+
+### 1. 命名空间 (Namespace) 的重要性
+
+在 HTML 中，如果你想用 JS 创建一个 `<div>`，你只需要 `document.createElement('div')`。
+但在 SVG 中，这样做**绝对不行**！如果你用这种方法创建 `<circle>`，浏览器只会把它当成一个未知的普通 HTML 标签，什么都不会画出来。
+
+创建 SVG 元素必须使用带有**命名空间**的 API：`document.createElementNS()`。
+
+```javascript
+// ❌ 错误做法：什么都不会显示
+const badCircle = document.createElement('circle');
+
+// ✅ 正确做法：使用 SVG 的命名空间 URI
+const svgNS = 'http://www.w3.org/2000/svg';
+const goodCircle = document.createElementNS(svgNS, 'circle');
+goodCircle.setAttribute('cx', '50');
+goodCircle.setAttribute('cy', '50');
+goodCircle.setAttribute('r', '20');
+
+document.querySelector('svg').appendChild(goodCircle);
+```
+
+### 2. 类名操作 (className)
+
+在旧版浏览器中，SVG 元素的 `className` 返回的不是一个字符串，而是一个 `SVGAnimatedString` 对象。这常常导致 `svgElement.className += ' active'` 这样的代码报错。
+
+虽然现代浏览器已经修复了这个问题，并且 SVG 现在也支持了非常好用的 `classList` 属性，但如果你在维护老代码，请注意这个历史坑点。
+
+<Callout type="tip" title="React 中的 className">
+  在 React 中写 SVG 时，我们依然使用 `className`（而不是像原生那样 `class="xxx"`），React 在底层已经帮我们处理好了这些兼容性问题。
+</Callout>
+
+---
+
+## 获取与设置属性
+
+对于 SVG 来说，由于很多表现属性（Presentation Attributes）比如 `fill`、`stroke` 等本质上既是 HTML 属性，又可以被 CSS 覆盖，因此操作它们时要留意优先级：
+
+```javascript
+const rect = document.querySelector('rect');
+
+// 1. 操作 DOM 属性（优先级最低）
+rect.setAttribute('fill', 'blue');
+
+// 2. 操作内联样式（优先级高）
+rect.style.fill = 'red';
+```
+
+## 学习导航
+
+掌握了如何获取和创建 SVG 元素后，接下来我们将深入学习 SVG JavaScript API 中最强大的两个部分：
+
+<Cards>
+  <Card title="13.2 几何计算 API" href="/docs/13-javascript/02-geometry-api">
+    利用原生 API 计算路径长度、获取曲线上某一点的精确坐标。
+  </Card>
+  <Card title="13.3 & 13.4 事件与交互" href="/docs/13-javascript/03-events-and-interaction">
+    掌握 pointer-events，处理 SVG 中的悬停、点击等交互事件。
+  </Card>
+</Cards>

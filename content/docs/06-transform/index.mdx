@@ -1,0 +1,59 @@
+---
+title: '6.1 基础变换与中心点'
+description: '彻底弄懂 SVG 的 transform 属性，以及那个折磨无数新手的“旋转中心点”问题'
+icon: 'Move'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { TransformBasicPlayground } from '@/components/docs/06-transform/basic/TransformBasicPlayground';
+
+如果你熟悉 CSS 的 `transform`，你可能会觉得 SVG 的变换很简单。**千万不要掉以轻心！** 
+SVG 的变换系统虽然语法看起来一样，但底层逻辑（特别是坐标系和中心点）与 HTML/CSS 截然不同。无数前端开发者在这里踩过深坑。
+
+## 交互探索：基础变换
+
+在这个演示器中，请重点观察**蓝色坐标轴（代表局部坐标系）**是如何随着图形一起发生变化的。
+
+<TransformBasicPlayground />
+
+---
+
+## 核心难点：永远的左上角
+
+这是你必须刻在脑子里的 SVG 铁律：
+**SVG 的所有变换（旋转、缩放、倾斜），默认永远是以画布的绝对原点 `(0,0)` 为中心进行的！**
+
+### 旋转的深坑
+在 CSS 中，如果你对一个 `<div>` 写 `transform: rotate(45deg)`，它会默认以自己的中心点原地旋转（因为 CSS 默认 `transform-origin: 50% 50%`）。
+
+但在 SVG 中，写 `transform="rotate(45)"`，图形会像被一根长长的绳子拴在画布左上角一样，绕着左上角甩出一个巨大的圆弧！
+
+**解决方案**：
+在 SVG 的 `rotate` 函数中，直接传入第二和第三个参数来指定旋转中心：
+`transform="rotate(角度 中心点X 中心点Y)"`
+
+例如，一个在 `(100, 100)` 位置，宽高为 `50` 的矩形，它的中心点是 `125, 125`，那么原地旋转的正确写法是：
+```xml
+<rect x="100" y="100" width="50" height="50" transform="rotate(45 125 125)" />
+```
+
+### 缩放的深坑
+缩放 (`scale`) 同样是以 `(0,0)` 为中心的。这意味着：
+如果你放大一个不在原点的图形（比如 `scale(2)`），它不仅会变大 2 倍，**它距离左上角的坐标也会变成原来的 2 倍**！看起来就像是图形在变大的同时向右下角“跑走”了。
+
+<Callout type="tip" title="CSS transform-origin 的兼容性">
+  在现代浏览器中（SVG 2.0 规范），你可以直接使用 CSS 的 <code>transform-origin: center; transform-box: fill-box;</code> 来让 SVG 元素像 HTML 元素一样以自身中心点旋转缩放。
+  <br/>但如果你需要兼容较老的浏览器，或者生成要导出给设计软件使用的纯 SVG 代码，最好还是老老实实计算并写死 <code>(cx, cy)</code> 坐标。
+</Callout>
+
+## 局部坐标系 (Local Coordinate System)
+
+为什么图形放大时会“跑走”？
+理解这个现象的终极秘诀是：**`transform` 改变的并不是图形本身，而是改变了绘制这个图形的“坐标系”**。
+
+当你在 `<g transform="scale(2)">` 中画一个 `x="50"` 的矩形时：
+1. 坐标系被放大了 2 倍，坐标轴上的每个刻度变长了。
+2. 矩形在新的坐标系中寻找 `x=50` 的位置。
+3. 换算回真实屏幕，它实际被画在了距离左边缘 100 像素的地方。
+
+请再回到上面的交互组件，切换到 `scale` 选项卡，仔细观察**蓝色的局部坐标系轴线**是如何跟着被拉伸的。理解了这一点，你就真正懂了 SVG 变换！

@@ -1,0 +1,83 @@
+---
+title: '19.3 SVG in Vue'
+description: '利用 Vue 模板系统的优势，保留原生 SVG 体验'
+icon: 'Terminal'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { VueSvgVisualizer } from '@/components/docs/19-frameworks/vue/VueSvgVisualizer';
+
+与 React 强制要求一切属性转为驼峰不同，**Vue 的单文件组件 (SFC) 使用的是基于 HTML 的模板语法**。
+这意味着，在绝大多数情况下，你可以把设计师发给你的原生 SVG 代码**直接粘贴**到 `<template>` 中，它就能正常工作！
+
+## 交互探索：Vue 数据驱动动画
+
+这是一个经典的“环形进度条”案例。拖动滑块改变 `percent` 数据，观察 Vue 是如何通过属性绑定 (`:`) 动态计算并更新 SVG 状态的。
+
+<VueSvgVisualizer />
+
+---
+
+## Vue 中使用 SVG 的优势
+
+### 1. 原汁原味的属性命名
+在 Vue 模板中，你**不需要**把 `stroke-width` 改成 `strokeWidth`，也不需要把 `class` 改成 `className`。
+
+```html
+<template>
+  <!-- 直接使用连字符，完全合法 -->
+  <svg class="icon" viewBox="0 0 24 24">
+    <path stroke-width="2" stroke-linecap="round" d="..." />
+  </svg>
+</template>
+```
+
+### 2. 强大的指令绑定
+Vue 的 `v-bind` (简写为 `:`) 让你能够极其方便地将响应式数据绑定到 SVG 属性上。你可以直接在模板里写简单的数学计算，这对于制作动态图表极其方便。
+
+```html
+<template>
+  <svg viewBox="0 0 100 100">
+    <!-- 动态绑定圆心和半径 -->
+    <circle 
+      :cx="xPosition" 
+      :cy="yPosition" 
+      :r="isHovered ? 20 : 10" 
+      @mouseenter="isHovered = true"
+      @mouseleave="isHovered = false"
+    />
+  </svg>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+const xPosition = ref(50)
+const yPosition = ref(50)
+const isHovered = ref(false)
+</script>
+```
+
+---
+
+## Vue 中的 SVG 组件化方案
+
+如果你不想把几百行 `<path>` 代码塞满你的 Vue 组件，业界常用的处理方案有：
+
+### 方案一：Vite 插件 (`vite-svg-loader` 或 `unplugin-svg-component`)
+类似于 React 的 SVGR，这个插件允许你把 `.svg` 文件直接作为 Vue 组件导入。
+
+```html
+<script setup>
+import IconHeart from './assets/heart.svg?component'
+</script>
+
+<template>
+  <!-- 作为组件使用，并可以传递 class 和样式 -->
+  <IconHeart class="text-red-500 w-6 h-6" />
+</template>
+```
+
+### 方案二：SVG Sprite 方案 (`vite-plugin-svg-icons`)
+这是目前 Vue 社区最流行的图标管理方案。插件会在构建时把你指定文件夹下的所有 SVG 打包成一个大的雪碧图注入到 HTML 中。
+然后你在项目中封装一个通用的 `<SvgIcon name="heart" />` 组件，内部通过 `<use :href="'#icon-' + name" />` 来调用。
+这种方式性能极高，非常适合后台管理系统。

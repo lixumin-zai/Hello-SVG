@@ -1,0 +1,64 @@
+---
+title: '14.3 主流开源图标库盘点'
+description: '不要重复造轮子，选择最适合你项目的开源 SVG 图标库'
+icon: 'Library'
+---
+
+import { Cards, Card } from 'fumadocs-ui/components/card';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+如果你不需要公司设计师专门定制独一无二的业务图标，那么直接使用成熟的开源图标库是最高效的选择。
+以下是目前前端社区最受欢迎的现代化 SVG 图标库：
+
+---
+
+## 线框风格霸主
+
+<Cards>
+  <Card title="Lucide" href="https://lucide.dev/" target="_blank">
+    目前最火的 React/Vue 图标库，是经典 Feather Icons 的社区继任者。包含 1000+ 高质量线框图标，全部是标准的 24x24 viewBox，极其轻量且支持按需引入（Tree-shaking）。**（强烈推荐）**
+  </Card>
+  <Card title="Heroicons" href="https://heroicons.com/" target="_blank">
+    Tailwind CSS 官方团队出品。提供 Outline (24px, 描边)、Solid (24px, 填充) 和 Mini (20px) 三种变体。设计极其克制、优雅。
+  </Card>
+</Cards>
+
+## 大而全的巨无霸
+
+<Cards>
+  <Card title="Phosphor Icons" href="https://phosphoricons.com/" target="_blank">
+    提供高达 6 种粗细/填充变体（Thin, Light, Regular, Bold, Fill, Duotone）。非常适合需要丰富视觉层次的大型后台管理系统。
+  </Card>
+  <Card title="Material Symbols" href="https://fonts.google.com/icons" target="_blank">
+    Google 官方最新出品。除了 SVG，它还支持革命性的 Variable Fonts（可变字体）技术，可以通过 CSS 无级调节图标的粗细、圆角和填充度！
+  </Card>
+</Cards>
+
+## 终极聚合方案：Iconify
+
+<Callout type="tip" title="Iconify：所有图标库的集合">
+  如果你想在一个项目里同时使用 Material 的菜单图标、Lucide 的箭头、Twitter 的官方 Logo... 你不需要安装三个库。
+  [Iconify](https://iconify.design/) 聚合了超过 100 个开源图标库（包含十几万个图标）。它提供了极其聪明的按需加载机制和统一的 API，在 Vite/Tailwind 生态中有着完美的插件支持。
+</Callout>
+
+---
+
+## 现代前端框架中的 SVG 组件化 (SVGR)
+
+在 React 或 Vue 中，我们其实很少去手写 `<svg><use .../></svg>` 这样的底层代码了。
+现代工具链（如 **SVGR**）可以在编译时，自动将你引入的 `.svg` 文件转换成一个 React 组件。
+
+```jsx
+// Webpack / Vite 配置好 SVGR 插件后：
+import { ReactComponent as HeartIcon } from './heart.svg';
+
+export function App() {
+  return (
+    <button>
+      <HeartIcon className="w-6 h-6 text-red-500" />
+      点赞
+    </button>
+  );
+}
+```
+这种方式彻底屏蔽了 SVG 的底层细节，让图标变成了普通的 UI 组件，同时天然享受 Tree-shaking 带来的体积优化。

@@ -1,0 +1,58 @@
+---
+title: '6.2 矩阵与组合变换'
+description: '揭开 matrix 的面纱，并理解为什么组合变换的顺序极其重要'
+icon: 'BoxSelect'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { MatrixPlayground } from '@/components/docs/06-transform/matrix/MatrixPlayground';
+
+在上一节我们学习了 `translate`、`rotate`、`scale` 等基础函数。
+但在 SVG 的底层渲染引擎中，它并不认识这些函数，它只认识一种东西：**变换矩阵 (Matrix)**。
+
+## 交互探索：矩阵与顺序
+
+在下方的演示器中，你可以直接操纵底层的 6 个矩阵参数。同时，在底部的“组合变换”区域，请仔细观察不同变换顺序带来的巨大差异。
+
+<MatrixPlayground />
+
+---
+
+## 终极魔法：`matrix(a, b, c, d, e, f)`
+
+SVG 的 2D 变换使用一个 3x3 的齐次变换矩阵。由于最后一行永远是 `[0, 0, 1]`，所以我们在代码中只需要写前两行的 6 个参数：
+
+| 参数 | 含义 |
+| :--- | :--- |
+| **a** | X 轴缩放 (Scale X) |
+| **b** | Y 轴倾斜 (Skew Y) |
+| **c** | X 轴倾斜 (Skew X) |
+| **d** | Y 轴缩放 (Scale Y) |
+| **e** | X 轴平移 (Translate X) |
+| **f** | Y 轴平移 (Translate Y) |
+
+所有的基础变换最终都会转换成这 6 个数字。比如 `translate(10, 20)` 就等于 `matrix(1, 0, 0, 1, 10, 20)`。
+在自动化工具（如 SVGO）优化 SVG 代码时，经常会把多个连续的 `transform` 合并成一个简短的 `matrix` 以节省体积。
+
+## 组合变换：顺序决定命运
+
+当你把多个变换写在同一个 `transform` 属性中时（例如 `transform="translate(100) rotate(45)"`），有一个极其反直觉的规则：
+**浏览器是从右向左（或从内向外）执行这些变换的！**
+
+我们来看看刚才演示器中的两个例子：
+
+### 情况 A：`transform="rotate(45) translate(100, 0)"`
+1. 先执行 `translate(100, 0)`：图形沿着当前的 X 轴向右平移了 100 像素。
+2. 后执行 `rotate(45)`：图形（连同它的坐标系）以原点 `(0,0)` 为中心，旋转了 45 度。
+*结果：图形像在一个半径为 100 的圆的轨道上移动了一段距离。*
+
+### 情况 B：`transform="translate(100, 0) rotate(45)"`
+1. 先执行 `rotate(45)`：图形原地旋转了 45 度（此时它的坐标系也倾斜了 45 度！）。
+2. 后执行 `translate(100, 0)`：图形沿着**已经倾斜了 45 度的新 X 轴**平移了 100 像素。
+*结果：图形朝着右下方（45度角的方向）平移出去了。*
+
+<Callout type="warn" title="分组变换 (g 标签)">
+  当你使用 <code>&lt;g&gt;</code> 标签嵌套时，顺序依然遵循这个规则：<br/>
+  <code>&lt;g transform="translate(10)"&gt;&lt;g transform="scale(2)"&gt;...&lt;/g&gt;&lt;/g&gt;</code> <br/>
+  内层的 <code>scale(2)</code> 会先执行，外层的 <code>translate(10)</code> 后执行。
+</Callout>

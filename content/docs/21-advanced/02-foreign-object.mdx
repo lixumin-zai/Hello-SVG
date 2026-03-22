@@ -1,0 +1,55 @@
+---
+title: '21.2 <foreignObject> 黑魔法'
+description: '打破次元壁，在 SVG 的无尽空间中嵌入原生的 HTML 和 CSS 布局'
+icon: 'BoxSelect'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { ForeignObjectVisualizer } from '@/components/docs/21-advanced/foreign/ForeignObjectVisualizer';
+
+在学习 SVG 的过程中，你可能发现了一个巨大的痛点：**在 SVG 中排版文字太痛苦了！**
+`<text>` 标签不支持自动换行，不支持 `<div>` 的盒子模型，不支持 `flex` 或 `grid` 布局。如果你想在 SVG 里画一个带圆角、带阴影、带内边距、还能自动换行的卡片，你需要写几十行极其繁琐的定位代码。
+
+这就是 **`<foreignObject>`** 登场的时候了。
+
+## 交互探索：在 SVG 中渲染输入框
+
+请尝试在下方的输入框中打字，并拖动滑块**旋转整个 SVG**。
+你会发现，这个输入框不仅能正常工作，而且它**完全受制于 SVG 的坐标系和变换引擎**！
+
+<ForeignObjectVisualizer />
+
+---
+
+## 什么是 `<foreignObject>`？
+
+`<foreignObject>` 是 SVG 中的一个特殊标签，它的作用是“在 SVG 的地盘上划出一块矩形区域，里面可以放置属于其他 XML 命名空间的内容”（在 Web 开发中，通常就是 HTML）。
+
+```xml
+<svg viewBox="0 0 200 200">
+  <!-- 画一个 SVG 圆 -->
+  <circle cx="100" cy="100" r="50" fill="blue" />
+  
+  <!-- 在 SVG 中开辟一块 100x100 的 HTML 区域 -->
+  <foreignObject x="50" y="50" width="100" height="100">
+    
+    <!-- 这是一个纯正的 HTML div！它支持 flex，支持自动换行！ -->
+    <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; color: white;">
+      <p>这是一段极长极长极长会自动换行的普通 HTML 文字。</p>
+    </div>
+    
+  </foreignObject>
+</svg>
+```
+
+<Callout type="warn" title="不可省略的 xmlns">
+  如果在原生的 <code>.svg</code> 文件中使用它，你**必须**在内部的 HTML 根元素（如 <code>&lt;div&gt;</code>）上声明 <code>xmlns="http://www.w3.org/1999/xhtml"</code>。否则 SVG 解析器会报错。但在 React JSX 或内联到 HTML 文档中时，浏览器/框架通常会自动帮你处理。
+</Callout>
+
+## 杀手级应用场景
+
+1. **复杂节点渲染**：在开发流程图、思维导图、无限画布应用（如 React Flow）时，节点内部通常需要包含头像、多行文本、下拉菜单。用 SVG 画这些太难了，标准的做法是外层连线用 SVG `<path>`，节点内容用 `<foreignObject>` 包裹 React/Vue 组件。
+2. **富文本导出截图**：这是著名的截图库 `html2canvas` 的底层原理之一。它可以把你的一段 HTML 塞进 `<foreignObject>`，然后把整个 SVG 转成 Data URL，再画到 Canvas 上，最后导出为 PNG！
+
+## 兼容性与坑点
+虽然它很强大，但它是 SVG 中 **Bug 最多、各家浏览器表现最不一致**的特性。特别是当你在 `foreignObject` 内部又使用了 CSS 3D 变换、或者是把它导出为图片时，Safari (WebKit) 常常会出现各种诡异的渲染截断问题。在生产环境使用前请务必进行充分的跨端测试。

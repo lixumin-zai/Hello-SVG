@@ -1,0 +1,31 @@
+---
+title: '10.1 复用与组合概览'
+description: '学会像程序员一样写 SVG：掌握 g、defs、use 与 symbol 标签，构建组件化图标库'
+icon: 'CopyPlus'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Cards, Card } from 'fumadocs-ui/components/card';
+import { ReusePlayground } from '@/components/docs/10-reuse/playground/ReusePlayground';
+
+当 SVG 图形变得越来越复杂时，如果把所有的代码都平铺直叙地写在画布上，代码会变得极难维护。
+SVG 提供了一套完整的“组件化”机制，允许我们对图形进行分组、声明变量并多次实例化。
+
+## 交互探索：复用组件实验室
+
+请在下方的演示器中依次切换三个选项卡，体会从“简单分组”到“终极组件化”的演进过程。
+
+<ReusePlayground />
+
+---
+
+## 核心概念概览
+
+<Cards>
+  <Card title="基础复用：g, defs, use" href="/docs/10-reuse/02-g-defs-use">
+    利用组元素对图形进行分组变换，通过 defs 声明可重用部件，并用 use 将其克隆到任意位置。
+  </Card>
+  <Card title="终极组件化：symbol" href="/docs/10-reuse/03-symbol">
+    解决 use 无法缩放的痛点。带独立 viewBox 机制的 symbol，是现代 SVG 精灵图的核心基础。
+  </Card>
+</Cards>

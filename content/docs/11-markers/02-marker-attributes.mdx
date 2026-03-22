@@ -1,0 +1,57 @@
+---
+title: '11.2 Marker 核心属性解析'
+description: '深入理解 refX、refY、markerUnits 等属性'
+icon: 'Settings2'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+## 如何应用 Marker
+
+定义好 `<marker>` 后（通常放在 `<defs>` 中），可以通过以下三个 CSS/SVG 属性将其应用到线条上：
+
+```xml
+<defs>
+  <!-- 定义一个 ID 为 arrow 的标记 -->
+  <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#f00" />
+  </marker>
+</defs>
+
+<!-- 在路径上应用标记 -->
+<path 
+  d="M 10 10 L 90 90" 
+  stroke="black"
+  marker-start="url(#arrow)"  <!-- 仅在起点 -->
+  marker-mid="url(#arrow)"    <!-- 在除了起点和终点外的所有节点 -->
+  marker-end="url(#arrow)"    <!-- 仅在终点 -->
+/>
+
+<!-- 或者简写（起点、中间、终点全都加上） -->
+<path d="..." marker="url(#arrow)" />
+```
+
+<Callout type="info" title="小贴士：marker-mid 怎么算？">
+  对于 `<path>` 来说，每一个命令（如 `L`, `C`, `Q`）生成的新点都是一个中间节点。如果是一条简单的直线 `M 0 0 L 100 100`，它只有起点和终点，**没有中间节点**，此时 `marker-mid` 不会生效！
+</Callout>
+
+## 核心属性详解
+
+要完美控制 Marker，你需要掌握以下几个关键属性：
+
+### 1. 基础属性与锚点对齐
+- `markerWidth` / `markerHeight`：Marker 视口（画布）的宽高。
+- `refX` / `refY`：**锚点坐标**。Marker 坐标系中的这个点，将会与目标路径上的节点重合。
+
+如果 `refX` 和 `refY` 没有设置，默认值是 `0`。这意味着 Marker 左上角会对齐到线段端点上。通常对于箭头，你需要将其设置为箭头尖端所在的坐标（例如上方的 `refX="10" refY="5"`）。
+
+### 2. 缩放策略 (`markerUnits`)
+决定 Marker 大小的计算基准：
+- `strokeWidth`（**默认且推荐**）：Marker 大小基于所在路径的线宽。路径越粗，箭头越大。此时 `markerWidth="10"` 意味着箭头宽度是线宽的 10 倍。
+- `userSpaceOnUse`：Marker 采用绝对大小。无论路径多粗多细，箭头大小始终保持不变。
+
+### 3. 旋转方向 (`orient`)
+决定标记物如何朝向：
+- `auto`：最常用。自动计算路径在该点的切线方向，标记物顺着线条方向。
+- `auto-start-reverse`：起点自动反向。如果首尾使用同一个箭头 Marker，设置这个属性可以让起点的箭头自动调转 180 度，非常适合做**双向箭头**。
+- `固定角度 (如 0, 90)`：无论线条怎么弯曲，标记物永远保持固定角度（适合折线图上的数据点，不管线怎么折，点永远是正的）。

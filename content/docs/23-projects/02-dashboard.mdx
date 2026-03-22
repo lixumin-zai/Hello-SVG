@@ -1,0 +1,94 @@
+---
+title: '23.2 实战：交互式数据大屏'
+description: '结合 D3.js 和 React，构建一个带有酷炫动画的折线图'
+icon: 'LineChart'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+数据大屏是 SVG 最经典的应用场景之一。在这个案例中，我们将探讨如何利用 React 的声明式渲染和 D3.js 的数学计算能力，来绘制一条带有平滑过渡动画和渐变背景的折线图。
+
+## 架构设计：谁来控制 DOM？
+
+在过去，D3.js 喜欢自己控制 DOM（使用 `.append()`, `.enter()`, `.exit()`）。但在 React 中，这会与虚拟 DOM 产生冲突。
+**现代最佳实践**：**D3 负责算数，React 负责画图**。
+
+1. 用 D3 的 `scaleLinear` 计算 X 轴和 Y 轴的映射比例。
+2. 用 D3 的 `line()` 生成器将数据点转换为 SVG 的 `d` 属性字符串（如 `M0,100 L50,50...`）。
+3. 用 React 的 JSX 直接渲染 `<path d={...}>`。
+
+## 核心代码骨架
+
+```jsx
+import { useMemo } from 'react';
+import * as d3 from 'd3';
+
+export function AreaChart({ data, width, height }) {
+  // 1. 定义比例尺 (D3 负责计算)
+  const xScale = useMemo(() => 
+    d3.scaleLinear().domain([0, data.length - 1]).range([0, width]),
+  [data, width]);
+
+  const yScale = useMemo(() => 
+    d3.scaleLinear().domain([0, d3.max(data)]).range([height, 0]),
+  [data, height]);
+
+  // 2. 生成折线路径
+  const linePath = useMemo(() => {
+    const lineGenerator = d3.line()
+      .x((d, i) => xScale(i))
+      .y(d => yScale(d))
+      .curve(d3.curveMonotoneX); // 让折线变平滑！
+    return lineGenerator(data);
+  }, [data, xScale, yScale]);
+
+  // 3. 生成下方的渐变填充区域路径
+  const areaPath = useMemo(() => {
+    const areaGenerator = d3.area()
+      .x((d, i) => xScale(i))
+      .y0(height) // 底部贴齐
+      .y1(d => yScale(d))
+      .curve(d3.curveMonotoneX);
+    return areaGenerator(data);
+  }, [data, xScale, yScale, height]);
+
+  // 4. React 负责渲染 DOM
+  return (
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+      <defs>
+        {/* 定义漂亮的渐变色 */}
+        <linearGradient id="area-gradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.4" />
+          <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+
+      {/* 渲染填充区域 */}
+      <path d={areaPath} fill="url(#area-gradient)" />
+      
+      {/* 渲染数据折线 */}
+      <path d={linePath} fill="none" stroke="#3b82f6" strokeWidth="3" />
+      
+      {/* 渲染交互式数据点 */}
+      {data.map((d, i) => (
+        <circle 
+          key={i}
+          cx={xScale(i)} 
+          cy={yScale(d)} 
+          r="4" 
+          fill="white" 
+          stroke="#3b82f6" 
+          strokeWidth="2"
+          className="hover:r-6 cursor-pointer transition-all duration-200"
+        />
+      ))}
+    </svg>
+  );
+}
+```
+
+## 技术难点拆解
+
+1. **Y 轴反转**：在 SVG 坐标系中，Y 轴是向下的。但在图表中，数值越大位置应该越高。我们在 `d3.scaleLinear().range([height, 0])` 中巧妙地反转了映射范围，解决了这个问题。
+2. **平滑曲线**：D3 提供了 `curveMonotoneX`，它可以自动把僵硬的折线点计算成带有贝塞尔曲线控制点的顺滑曲线。
+3. **性能优化**：我们将所有的 D3 计算逻辑都放进了 `useMemo`，确保只有当 `data` 或 `width` 发生变化时，才会重新计算庞大的路径字符串。

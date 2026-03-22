@@ -1,0 +1,49 @@
+---
+title: '5.1 & 5.2 样式基础与填充'
+description: '了解给 SVG 添加样式的三种方式，并掌握填充 (Fill) 与 currentColor 的黑科技'
+icon: 'PaintBucket'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { FillStylePlayground } from '@/components/docs/05-style/fill/FillStylePlayground';
+
+画出了形状和路径后，我们需要给它们上色。SVG 提供了极其丰富的样式控制能力。
+
+## 添加样式的三种方式
+
+SVG 是一个神奇的规范，它允许你用三种不同的方式为同一个属性赋值（比如填充颜色）。它们的优先级从低到高如下：
+
+1. **表现属性 (Presentation Attributes)**：最常见的方式。直接写在标签上，如 `<rect fill="red" />`。它优先级最低，很容易被外部 CSS 覆盖。
+2. **内部/外部 CSS 样式表**：你可以通过 `class` 类名，用普通的 CSS 给 SVG 上色：`.my-rect { fill: blue; }`。
+3. **内联 style 属性**：优先级最高。`<rect style="fill: green;" />`。
+
+<Callout type="tip" title="最佳实践">
+  在现代前端开发中，推荐使用**表现属性**（如 <code>fill="red"</code>）来设置默认样式，这样你可以随时在外部用 CSS（如 Tailwind 的 <code>fill-blue-500</code> 类）轻松覆盖它。
+</Callout>
+
+---
+
+## 交互探索：填充与透明度
+
+在下方的演示器中，尝试改变填充颜色、对比 `fill-opacity` 与全局 `opacity` 的区别，并体验强大的 `currentColor` 魔法。
+
+<FillStylePlayground />
+
+## 核心概念解析
+
+### 1. `fill` (填充色)
+决定了图形内部的颜色。可以接受的值与 CSS 完全一致：
+- 关键词：`red`, `blue`, `transparent`, `none`
+- 十六进制：`#FF0000`
+- RGB/HSL/OKLCH 等：`rgba(255, 0, 0, 0.5)`
+- 甚至可以是指向渐变或图案的链接：`url(#myGradient)`（我们将在第七章详细学习）。
+
+### 2. `none` 与透明的区别
+在 SVG 中，`fill="none"` 和 `fill="transparent"`（或 `opacity="0"`）在视觉上看起来一样（都是透明的），但**在交互上有致命的区别**：
+*   **`none`**：这个图形的内部是“空”的。你的鼠标点击会直接穿透它，点到它下面的元素。
+*   **`transparent`**：图形内部有颜色，只是颜色是透明的。它**可以**接收鼠标的 `hover` 和 `click` 事件！
+
+### 3. 神奇的 `currentColor`
+当你把 SVG 的 `fill` 或 `stroke` 设置为 `currentColor` 时，它会**自动继承其父级 HTML 元素的文字颜色（color 属性）**。
+
+这是构建现代 SVG 图标库（Icon System）的绝对核心技术！有了它，你在 React/Vue 中使用图标时，只需要给外层的 `<div>` 设置文字颜色，内部的 SVG 就会自动跟着变色，再也不需要通过 props 传颜色进去了。

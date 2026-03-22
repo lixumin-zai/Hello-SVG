@@ -1,0 +1,48 @@
+---
+title: '3.1 & 3.2 线条与矩形'
+description: '掌握绘制直线 (line)、折线 (polyline) 和矩形 (rect) 的基本属性'
+icon: 'Minus'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { LineRectPlayground } from '@/components/docs/03-basic-shapes/lines-rects/LineRectPlayground';
+
+虽然 SVG 的终极武器是 `<path>`（路径），但对于一些规则的几何图形，使用语义化的基础形状元素会更简单、代码更易读。
+
+本节我们将学习最基础的三个形状：`<line>`（直线）、`<polyline>`（折线）和 `<rect>`（矩形）。
+
+## 交互探索
+
+请通过下方的滑块，动手改变属性值，观察右侧图形的实时变化。
+
+<LineRectPlayground />
+
+---
+
+## 重点解析
+
+### `<line>` 直线
+直线是最基础的元素，它只需要知道**起点**和**终点**。
+
+*   `x1`, `y1`：起点的 X 和 Y 坐标。
+*   `x2`, `y2`：终点的 X 和 Y 坐标。
+
+<Callout type="warn" title="不可见的直线">
+  <strong>直线没有面积，只有长度！</strong>因此，它不会响应 <code>fill</code>（填充色）属性。如果你不给它设置 <code>stroke</code>（描边颜色）和 <code>stroke-width</code>，它是完全不可见的。
+</Callout>
+
+### `<polyline>` 折线
+折线是一系列相连的直线段。它主要用于绘制折线图或多边形的未闭合边缘。
+
+*   `points`：包含一系列点坐标的列表。格式非常灵活，数字之间可以用空格、逗号或甚至回车分隔。例如：`"0,0 50,50 50,100"` 或者 `"0 0, 50 50, 50 100"` 都是合法的。
+*   **开放路径**：与后面要讲的 `<polygon>` 不同，`<polyline>` 默认是**不闭合**的（起点和终点不会自动连起来）。
+
+### `<rect>` 矩形
+绘制矩形或圆角矩形。
+
+*   `x`, `y`：矩形**左上角**的坐标。（注意：不是中心点！）
+*   `width`, `height`：宽度和高度。
+*   `rx`, `ry`：圆角半径。
+    *   如果只设置了 `rx`，那么 `ry` 会自动等于 `rx`（产生正圆角）。
+    *   如果 `rx` 和 `ry` 的值不同，会产生椭圆形的圆角。
+    *   如果 `rx` 的值超过了矩形宽度的一半，它会被限制在宽度的一半（这可以用来快速画出“胶囊”形状）。

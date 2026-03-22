@@ -1,0 +1,70 @@
+---
+title: '19.2 SVG in React (JSX)'
+description: '在 React 中优雅地封装和驱动 SVG 组件'
+icon: 'Code'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { ReactSvgVisualizer } from '@/components/docs/19-frameworks/react/ReactSvgVisualizer';
+
+在 React 中写 SVG，你实际上是在写 **JSX**。React 会在底层把你的 JSX 转换为对应的 `React.createElement` 调用。
+正因为如此，在 React 中直接粘贴原生 SVG 代码是会报错的！
+
+## 交互探索：React SVG 组件封装
+
+在下方实验室中，试着调整左侧的 Props 面板。观察中间的 React JSX 代码是如何通过参数注入，动态改变右侧 SVG 的渲染结果的。
+
+<ReactSvgVisualizer />
+
+---
+
+## React 中使用 SVG 的三大陷阱与规则
+
+### 1. 驼峰命名法 (CamelCase)
+这是新手最容易踩的坑。在原生 SVG 中，很多属性是用连字符连接的（比如 `stroke-width`、`fill-opacity`）。
+在 React JSX 中，**必须全部转换为驼峰命名法**：
+- `stroke-width` 变成 `strokeWidth`
+- `stroke-linecap` 变成 `strokeLinecap`
+- `clip-path` 变成 `clipPath`
+
+<Callout type="warn" title="例外情况：aria-* 和 data-*">
+  <code>aria-</code> 和 <code>data-</code> 开头的属性是例外，它们在 React 中依然**保持原样**连字符写法。
+</Callout>
+
+### 2. `class` 变成 `className`
+和普通的 HTML 元素一样，SVG 元素的 `class` 属性在 JSX 中必须写成 `className`。
+
+### 3. 内联 Style 是对象
+如果你要在 SVG 元素上写内联样式，它必须是一个 JavaScript 对象，而不是字符串：
+```jsx
+// ❌ 错误
+<path style="transform: translateX(10px); fill: red;" />
+
+// ✅ 正确
+<path style={{ transform: 'translateX(10px)', fill: 'red' }} />
+```
+
+---
+
+## 自动化工具：SVGR
+
+如果设计师发给你一个极其复杂的 SVG 文件，手动把所有连字符改成驼峰简直是噩梦。
+这时候我们需要 **SVGR**。
+
+SVGR 是一个工具（也是 Create React App 和 Next.js 等框架默认内置的 webpack/vite 插件），它可以**在编译时自动把原始的 .svg 文件转换成一个 React 组件**。
+
+```jsx
+// 假设你配置了 SVGR，直接把 svg 文件当作组件导入！
+import { ReactComponent as StarIcon } from './assets/star.svg';
+
+export function App() {
+  return (
+    <div>
+      <h1>评价</h1>
+      {/* 像普通 React 组件一样传递 className 和样式！ */}
+      <StarIcon className="w-8 h-8 text-yellow-500" />
+    </div>
+  );
+}
+```
+通过这种方式，你的组件代码会非常干净，所有的转换脏活累活都交给了构建工具。

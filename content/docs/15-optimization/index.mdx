@@ -1,0 +1,35 @@
+---
+title: '15.1 SVG 优化概览'
+description: '为什么要优化 SVG？了解从设计软件导出的"脏代码"以及优化的核心原则'
+icon: 'Zap'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Cards, Card } from 'fumadocs-ui/components/card';
+
+无论是由 Adobe Illustrator、Figma 还是 Sketch 导出的 SVG 文件，往往都包含大量对于 Web 渲染毫无用处的“脏数据”。
+如果不加处理直接投入生产环境，不仅会拖慢页面加载速度，还可能因为冗余的 DOM 节点导致渲染卡顿。
+
+## 优化的两个维度
+
+SVG 优化主要分为两个截然不同的方向：
+
+<Cards>
+  <Card title="1. 文件体积优化 (代码级)" href="/docs/15-optimization/02-svgo">
+    去除冗余代码、精简路径数据、压缩文件大小。这主要影响**网络加载速度**。我们通常使用自动化工具（如 SVGO）来完成。
+  </Card>
+  <Card title="2. 渲染性能优化 (DOM 级)" href="/docs/15-optimization/03-performance">
+    减少 DOM 节点数量、谨慎使用高耗能滤镜。这主要影响浏览器的**绘制和动画帧率 (FPS)**，是大型数据可视化必须面对的挑战。
+  </Card>
+</Cards>
+
+---
+
+## 手动优化：在导出前该做的事
+
+虽然自动化工具很强大，但在设计软件中养成良好的制图习惯，是得到高质量 SVG 的前提：
+
+1. **减少锚点数量**：使用平滑工具去掉路径上多余的节点。视觉上看不出区别，但代码体积会大幅减小。
+2. **合并路径 (Compound Path)**：如果几个形状颜色相同且不需要独立做动画，把它们合并为一个单一的 `<path>`，可以显著减少 DOM 节点数。
+3. **优先使用基础形状**：如果画的是一个正圆，请使用 `<circle>` 而不是用四个贝塞尔曲线拼成的 `<path>`。前者计算更快，语义也更明确。
+4. **清理隐藏图层**：导出前删除那些被隐藏或被完全遮挡的无用图层。

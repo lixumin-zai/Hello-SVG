@@ -1,0 +1,31 @@
+---
+title: '19.1 SVG 在前端框架中的使用'
+description: '告别原生 DOM 操作，拥抱组件化时代的 SVG 开发'
+icon: 'Box'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Cards, Card } from 'fumadocs-ui/components/card';
+
+在第十三部分，我们学习了如何使用原生 JavaScript DOM API (如 `createElementNS`、`setAttribute`) 来操作 SVG。那是最底层的原理，但在实际的企业级开发中，我们几乎不会那么做。
+
+在现代前端开发中，我们通常使用 **React**、**Vue**、**Svelte** 或 **Angular** 等框架。这些框架的核心理念是**声明式渲染**和**组件化**，这与 SVG 的 XML 结构天然契合！
+
+## 为什么要在框架中写 SVG？
+
+1. **数据驱动图形**：不需要手动写繁琐的 DOM 操作代码。只要改变状态 (State/Ref)，框架会自动帮你更新 SVG 的 `x`、`y` 或 `fill` 属性。
+2. **完美组件化**：一个复杂的图标、一个图表坐标轴，都可以被封装成独立的 `<MyAxis />` 组件，随处复用。
+3. **Props 注入**：你可以通过传递 Props 来动态改变 SVG 的颜色、大小、动画状态。
+
+## 不同框架的处理哲学
+
+不同的框架在处理 SVG 时有不同的语法和编译规则：
+
+<Cards>
+  <Card title="SVG in React (JSX)" href="/docs/19-frameworks/02-react">
+    React 要求将所有 HTML/SVG 属性转换为驼峰命名法 (CamelCase)，并使用 className 代替 class。
+  </Card>
+  <Card title="SVG in Vue (Template)" href="/docs/19-frameworks/03-vue">
+    Vue 保留了原生的 HTML/SVG 书写习惯，连字符属性原样保留，通过指令 (`:`, `v-bind`) 进行数据绑定。
+  </Card>
+</Cards>

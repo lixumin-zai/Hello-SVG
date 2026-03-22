@@ -1,0 +1,121 @@
+---
+title: '23.3 实战：企业级图标系统'
+description: '使用 Vite 插件构建一套支持自动优化的 SVG Sprite 组件库'
+icon: 'Boxes'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+在大型企业级应用中，UI 设计师可能会提供几百个业务图标。如何管理这些图标，使其既能方便调用，又能做到按需加载、极致优化，是前端工程化的一大挑战。
+
+本案例将展示如何基于 `vite-plugin-svg-icons` 构建一套类似于 Element Plus 或 Ant Design 的图标组件。
+
+## 目录结构设计
+
+首先，在你的项目中约定一个专门存放原始 SVG 的目录：
+
+```text
+src/
+  assets/
+    icons/           <-- 设计师导出的原始 SVG 放这里
+      user.svg
+      settings.svg
+      menu/
+        dashboard.svg
+  components/
+    Icon.vue         <-- 通用的封装组件
+```
+
+## 第一步：配置 Vite 插件
+
+在 `vite.config.js` 中引入插件。这个插件会在启动时自动扫描你的 `icons` 文件夹，调用 SVGO 进行清洗，然后把它们打包成一个包含所有 `<symbol>` 的巨大 `<svg>`，并自动注入到 `index.html` 的 `<body>` 顶部。
+
+```javascript
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
+import path from 'path'
+
+export default defineConfig({
+  plugins: [
+    vue(),
+    createSvgIconsPlugin({
+      // 指定需要缓存的图标文件夹
+      iconDirs: [path.resolve(process.cwd(), 'src/assets/icons')],
+      // 指定 symbolId 的格式 (这里会根据文件夹层级生成 id)
+      // 例如 menu/dashboard.svg 的 id 会变成 icon-menu-dashboard
+      symbolId: 'icon-[dir]-[name]',
+    }),
+  ],
+})
+```
+
+## 第二步：封装通用组件 (以 Vue 为例)
+
+我们需要封装一个 `<Icon>` 组件，对外暴露一个极其简单的 API：只需要传入图标的名称，它就能自动调用对应的 Sprite。
+
+```html
+<!-- src/components/Icon.vue -->
+<template>
+  <svg 
+    aria-hidden="true" 
+    class="svg-icon" 
+    :style="{ width: size, height: size, color: color }"
+  >
+    <use :href="symbolId" />
+  </svg>
+</template>
+
+<script setup>
+import { computed } from 'vue'
+
+const props = defineProps({
+  name: {
+    type: String,
+    required: true
+  },
+  color: {
+    type: String,
+    default: 'currentColor' // 默认继承父级文本颜色！
+  },
+  size: {
+    type: String,
+    default: '1em' // 默认和周围文字一样大！
+  }
+})
+
+// 根据插件的配置规则拼接完整 ID
+const symbolId = computed(() => `#icon-${props.name}`)
+</script>
+
+<style scoped>
+.svg-icon {
+  /* 垂直居中对齐周围的文字 */
+  vertical-align: -0.15em;
+  /* 允许使用 color 属性控制 fill 颜色 */
+  fill: currentColor;
+  overflow: hidden;
+}
+</style>
+```
+
+## 第三步：在业务中使用
+
+现在，任何前端开发人员只需要写一行代码，就可以使用系统里的任何图标，而且完全不用担心样式错乱、加载闪烁或体积过大的问题。
+
+```html
+<template>
+  <div class="user-card text-blue-500 text-2xl">
+    <!-- 图标会自动变成蓝色，24px 大小！ -->
+    <Icon name="user" />
+    <span>张三</span>
+    
+    <!-- 调用子文件夹里的图标，并覆盖默认颜色 -->
+    <Icon name="menu-dashboard" color="red" size="2rem" />
+  </div>
+</template>
+```
+
+<Callout type="tip" title="工作流收益">
+  有了这套系统，当设计师更新图标时，你只需要把新的 <code>.svg</code> 文件丢进 <code>src/assets/icons/</code> 文件夹，保存，完事。没有任何额外的代码修改，Vite 会自动热更新！
+</Callout>

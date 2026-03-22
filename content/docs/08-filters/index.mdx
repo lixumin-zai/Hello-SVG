@@ -1,0 +1,55 @@
+---
+title: '8.1 & 8.3 滤镜基础与模糊'
+description: '掌握 SVG 滤镜的工作原理，以及最常用的高斯模糊（feGaussianBlur）'
+icon: 'Wand2'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { BlurPlayground } from '@/components/docs/08-filters/basic/BlurPlayground';
+
+SVG 滤镜（Filters）是 Web 前端领域最强大的图像处理系统，没有之一。通过组合不同的滤镜原语（Filter Primitives），你可以在浏览器里直接生成水波纹、火焰、毛玻璃、浮雕等惊艳的特效。
+
+## 滤镜的工作原理
+
+滤镜就像是一个流水线工厂：
+1. 它首先抓取目标图形的像素（`SourceGraphic`）。
+2. 把这些像素送入第一个滤镜原语（比如模糊处理）。
+3. 第一个原语处理完后，把结果（`result`）传递给下一个原语（比如颜色变换）。
+4. 经过一系列处理后，最终输出到屏幕上。
+
+定义一个滤镜和定义渐变一样，需要放在 `<defs>` 中，并在目标图形上通过 `filter="url(#id)"` 引用。
+
+## 交互探索：高斯模糊与裁剪边界
+
+`<feGaussianBlur>` 是最简单、也最常用的滤镜原语。但在使用它时，几乎所有人都会遇到**“边缘被一刀切”**的 Bug。请在下方演示器中亲自体验并解决这个问题。
+
+<BlurPlayground />
+
+---
+
+## 核心难点：滤镜作用域 (Filter Region)
+
+如果你在上面的演示器中把 X 轴的模糊强度 (`stdDeviation`) 拉到最大，你会发现蓝色的圆周围出现了一个**直角矩形的硬切边**。这看起来非常丑陋，为什么会这样？
+
+### 为什么会被切断？
+因为浏览器为了节省性能（滤镜计算非常消耗 GPU），它默认**只会计算图形包围盒（Bounding Box）周围一小圈**的区域。
+默认的滤镜作用区域是：
+- `x="-10%"`
+- `y="-10%"`
+- `width="120%"`
+- `height="120%"`
+
+当你的模糊半径太大，颜色扩散到了这个 `120%` 的边界之外时，超出的部分就会被直接砍掉不渲染！
+
+### 解决方案
+当你发现滤镜效果被切断时，只需要给外层的 `<filter>` 标签增加边界：
+```xml
+<filter id="myBlur" x="-50%" y="-50%" width="200%" height="200%">
+  <feGaussianBlur stdDeviation="20" />
+</filter>
+```
+（在上面的演示器中，尝试将 `x`, `y` 向左拖动，将 `width`, `height` 向右拖动，把橙色虚线框放大，硬切边就会消失）。
+
+### 单向模糊 (动感模糊)
+`<feGaussianBlur>` 的 `stdDeviation` 属性可以接收两个值：`stdDeviation="X Y"`。
+如果你把 Y 设为 0，只保留 X 方向的模糊，就能做出物体高速横向运动时的**动感模糊 (Motion Blur)** 效果。这在做 UI 动画时非常实用。

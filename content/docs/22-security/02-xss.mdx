@@ -1,0 +1,50 @@
+---
+title: '22.2 XSS 攻击模拟与渲染上下文'
+description: '不同的嵌入方式如何决定 SVG 中恶意脚本的命运'
+icon: 'Bug'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { XSSVisualizer } from '@/components/docs/22-security/xss/XSSVisualizer';
+
+一个包含了 `<script>` 标签的 `evil.svg` 到底会不会执行？这完全取决于**你是如何把它渲染到页面上的**。
+
+浏览器厂商早就意识到了 SVG 的危险性，因此为不同的引入方式设计了不同的“沙箱 (Sandbox)”隔离级别。
+
+## 交互探索：嵌入方式与 XSS 风险
+
+假设一个黑客成功上传了包含 `alert('被黑了')` 的 `evil.svg`，而前端开发者在展示这个头像时，分别采用了三种不同的标签。
+请点击下方选项卡，查看恶意脚本是否能成功执行！
+
+<XSSVisualizer />
+
+---
+
+## 渲染方式的安全级别总结
+
+### 🟢 绝对安全：作为“纯图像”渲染
+当你使用 `<img>` 或 CSS 的 `background-image` 引入 SVG 时，浏览器会启动**最严格的限制模式**：
+- 禁止执行任何 JavaScript。
+- 禁止加载任何外部资源（比如 SVG 里的 `<image href="http...">` 或外部 CSS 统统失效）。
+- 禁止所有的交互事件（hover, click）。
+- 这种方式非常适合渲染用户上传的图标或插画，**无需消毒也非常安全**。
+
+```html
+<!-- 黑客的脚本在这里会彻底变成哑巴 -->
+<img src="user-upload-evil.svg" />
+```
+
+### 🟡 危险：作为“独立文档”渲染
+当你使用 `<object>`, `<iframe>` 或 `<embed>` 引入 SVG 时：
+- SVG 内部的脚本**会执行**！
+- 如果这个 SVG 放在另一个域名下（比如 CDN），它受到跨域策略 (CORS) 保护，无法读取主站的 Cookie（危害较小）。
+- 但如果它和你的主站同源，它就可以通过 `window.parent` 获取主站的权限。
+
+### 🔴 致命：内联渲染 (Inline)
+最可怕的做法。如果你通过 API 获取了 SVG 字符串，然后使用 `innerHTML` (或 Vue 的 `v-html`，React 的 `dangerouslySetInnerHTML`) 把它直接塞进 DOM 树。
+- 此时，SVG 彻底融入了当前页面的 DOM。
+- 里面的 `<script>` 和 `<path onload="...">` 会立即在**当前最高权限上下文中执行**。你的 Token 和 Cookie 瞬间被盗。
+
+<Callout type="warn" title="安全铁律">
+  永远、永远、永远不要使用 `innerHTML` 渲染未经后端深度消毒的用户提供的 SVG 字符串！
+</Callout>

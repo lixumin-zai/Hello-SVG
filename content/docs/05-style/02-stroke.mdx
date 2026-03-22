@@ -1,0 +1,45 @@
+---
+title: '5.3 描边属性全解析'
+description: '深入理解线端、转角、斜接限制，以及创造 SVG 动画魔法的虚线属性'
+icon: 'Pen'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { StrokePlayground } from '@/components/docs/05-style/stroke/StrokePlayground';
+
+除了内部填充（Fill），给图形勾勒轮廓的**描边（Stroke）**属性在 SVG 中有着极高的地位。通过控制描边，我们可以画出各种风格的图标，甚至制作出惊艳的路径动画。
+
+## 交互探索：描边实验室
+
+请特别留意画布上的**红色细线**，它代表了代码中实际写下的几何路径坐标。观察当线宽（`stroke-width`）增加时，蓝/绿色的实际渲染像素是如何围绕这条红色几何线分布的。
+
+<StrokePlayground />
+
+---
+
+## 核心属性解析
+
+### 1. 线端形状 (`stroke-linecap`)
+决定了开放路径（如 `<line>` 或未闭合的 `<path>`）端点的样式：
+- `butt`（默认）：切平。线的边界正好停在端点坐标上。
+- `round`：圆角。在端点处加上一个半径为线宽一半的半圆。**这是现代 UI 图标最常用的设置！**
+- `square`：方角。在端点处加上一个长为线宽一半的矩形。（注意它会让线看起来比实际坐标长）。
+
+### 2. 转角形状 (`stroke-linejoin`)
+决定了两条线相交时，拐角的样式：
+- `miter`（默认）：尖角。外侧边缘直接延伸相交。
+- `round`：圆角。拐角处用平滑的圆弧连接。
+- `bevel`：斜角。直接切平拐角。
+
+<Callout type="warn" title="Miterlimit (斜接限制) 的作用">
+  当你使用 <code>miter</code> (尖角) 并且两条线夹角非常锐利时，那个尖角可能会伸出非常远，看起来像一根长长的刺。
+  <code>stroke-miterlimit</code> 就是用来限制这个尖角长度的。如果计算出的尖角长度超过了这个限制值，浏览器就会自动把它切平（退化成 <code>bevel</code> 效果）。
+</Callout>
+
+### 3. 虚线魔法 (`stroke-dasharray` & `stroke-dashoffset`)
+这是 SVG 描边系统中最强大的特性，也是所有“路径描边动画”（如手写字动画、加载进度环）的底层原理。
+
+*   **`stroke-dasharray`**：定义虚线的模式。比如 `10, 5` 表示“画 10 个单位的实线，留 5 个单位的空白，如此循环”。
+*   **`stroke-dashoffset`**：定义虚线模式的起始偏移量。如果你在上面的演示器中拖动这个滑块，你会发现虚线“动”起来了！
+
+> 💡 **动画剧透**：如果我们把 `dasharray` 设置得比整条路径还要长（此时看起来是一条实线），然后把 `dashoffset` 也设置为这个长度（此时线被完全推到视线外，变空白）。接着，我们用 CSS 动画把 `dashoffset` 慢慢减小到 0，这条线就会像被人一笔一画写出来一样！这就是经典的 SVG Draw 动画。我们会在第十二章详细学习。

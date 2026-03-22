@@ -1,0 +1,37 @@
+---
+title: '21.1 SVG 高级与前沿话题'
+description: '超越传统的图形边界，探索 SVG 在生成艺术、AI 和架构层面的前沿应用'
+icon: 'Rocket'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Cards, Card } from 'fumadocs-ui/components/card';
+
+随着 Web 技术的不断演进，SVG 早已不仅仅是一个“画图的标签”。在一些高级的 Web 应用和实验性项目中，SVG 正在展现出令人惊叹的潜力。
+
+## 本章探讨的黑魔法
+
+<Cards>
+  <Card title="foreignObject：在 SVG 中写 HTML" href="/docs/21-advanced/02-foreign-object">
+    SVG 中最强大、最神奇、也最容易出 Bug 的标签。它打破了 SVG 和 HTML 的次元壁，允许你在矢量图形中嵌入原生的 <code>&lt;div&gt;</code>、<code>&lt;input&gt;</code> 甚至 <code>&lt;video&gt;</code>。
+  </Card>
+</Cards>
+
+---
+
+## 前沿应用：生成艺术 (Generative Art)
+
+相比于在 Canvas 中用复杂的数学公式逐像素绘制像素点，SVG 在生成艺术中有一个巨大的优势：**它是结构化的 DOM**。
+
+使用 JavaScript（如 `p5.js` 或纯原生 JS），通过随机数（Math.random）、柏林噪声（Perlin Noise）或分形算法生成无数个 `<path>` 或 `<circle>`。
+因为最终生成的是 SVG：
+1. 它**永远不会模糊**，你可以把生成的复杂网格打印成一整面墙的壁纸。
+2. 你可以随时用浏览器的开发者工具选中其中一根线，修改它的颜色。
+3. 它非常适合配合**笔式绘图仪 (Pen Plotter)**，将代码直接转化为物理世界的机械臂绘画。
+
+## SVG 与 AI 的结合
+
+在 AIGC（人工智能生成内容）时代，SVG 展现出了独特的价值：
+
+- **大模型的天然友好格式**：因为 SVG 是纯文本（XML），所以像 ChatGPT、Claude 这样的 LLM 可以**直接输出 SVG 代码**。你可以对 AI 说：“用 SVG 画一个极简风格的咖啡杯图标”，它能当场给你返回可以直接渲染的代码。这对于生成 Canvas 像素图来说是做不到的。
+- **UI 生成器**：现代的 AI 前端生成工具（如 v0.dev）大量使用 SVG 配合 Tailwind CSS，直接生成包含精美插图的 React 组件。

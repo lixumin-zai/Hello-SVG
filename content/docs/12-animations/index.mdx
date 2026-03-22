@@ -1,0 +1,36 @@
+---
+title: '12.1 动画 (Animations) 概览'
+description: '让 SVG 动起来的各种流派与陷阱'
+icon: 'PlayCircle'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Cards, Card } from 'fumadocs-ui/components/card';
+import { AnimationLab } from '@/components/docs/12-animations/playground/AnimationLab';
+
+## SVG 动画三大流派
+
+SVG 的强大之处在于它的可编程性。因为它是基于 DOM 的结构，所以让它动起来有三种完全不同的方法：
+
+<Cards>
+  <Card title="1. 原生 SMIL 动画" href="/docs/12-animations/03-smil-animations">
+    写在 SVG 标签内的原生动画。支持极其强大的路径跟随、属性补间，甚至不需要写任何 JS 和 CSS。
+  </Card>
+  <Card title="2. CSS 动画" href="/docs/12-animations/02-css-animations">
+    最常见的方式。利用 CSS @keyframes 和 transition 来控制 SVG 的颜色、透明度、描边等属性。
+  </Card>
+  <Card title="3. JavaScript 动画库" description="最硬核的方式。使用 GSAP、Framer Motion 等库直接操纵 DOM，可以实现复杂的路径变形 (Morphing)。" />
+</Cards>
+
+---
+
+## 动画实验室 (Animation Lab)
+
+与其看长篇大论的代码，不如直接在实验室里感受三种经典 SVG 动画技巧 👇
+
+<AnimationLab />
+
+<Callout type="tip" title="进一步学习">
+  想要了解如何使用纯 CSS 制作路径画线动画？或者如何使用原生 SMIL 实现复杂的路径跟随？
+  请阅读后续章节。
+</Callout>

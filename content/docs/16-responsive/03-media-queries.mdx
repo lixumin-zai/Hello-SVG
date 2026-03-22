@@ -1,0 +1,75 @@
+---
+title: '16.3 SVG 内部的媒体查询'
+description: '让 SVG 拥有自己的大脑，自带暗黑模式与断点响应'
+icon: 'Palette'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { MediaQueriesVisualizer } from '@/components/docs/16-responsive/media/MediaQueriesVisualizer';
+
+在 Web 开发中，我们习惯于在全局的 `.css` 文件中写 `@media` 查询来控制页面布局。
+但 SVG 的一个杀手级特性是：**它可以在文件内部嵌入自己的 `<style>` 标签，并且完全支持媒体查询！**
+
+这意味着你可以把一个 SVG 文件当作独立的模块分发（甚至作为一个 `<img src="logo.svg">` 插入），它依然能够感知用户系统的状态。
+
+## 交互探索：自带暗黑模式的 SVG
+
+点击下方的按钮切换系统主题。这模拟了操作系统级别的深色/浅色模式切换。
+你会看到 SVG 图形内部的天空、太阳会自动改变颜色和位置。
+
+<MediaQueriesVisualizer />
+
+---
+
+## 如何在 SVG 中编写媒体查询
+
+### 1. 响应系统主题 (Dark Mode)
+
+如果你把公司的 Logo 导出为 SVG 放在官网上，你希望用户切换深色模式时，Logo 上的黑色文字自动变成白色：
+
+```xml
+<svg viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    /* 默认浅色模式样式 */
+    .brand-text { fill: #000000; }
+    
+    /* 当系统偏好深色模式时生效 */
+    @media (prefers-color-scheme: dark) {
+      .brand-text { fill: #FFFFFF; }
+    }
+  </style>
+  
+  <text class="brand-text" x="10" y="35" font-size="30">MyBrand</text>
+</svg>
+```
+**震撼之处在于**：哪怕你是通过 `background-image: url(logo.svg)` 引入的这张图，它内部的这段代码依然会生效！
+
+### 2. 响应屏幕尺寸 (尺寸断点)
+
+你可以在 SVG 内部使用 `@media (min-width: 500px)`。
+<Callout type="warn" title="注意：这里的 width 指的是什么？">
+  如果 SVG 是内联的 (`<svg>`)，这里的 `width` 通常指浏览器的视口宽度（Viewport）。
+  但如果你通过 `<img src="...svg">` 或 `<iframe>` 嵌入，这个 `width` 指的是**该 img/iframe 标签本身的宽度**（也就是早期的容器查询 Container Queries 概念！）。
+</Callout>
+
+```xml
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    /* 默认手机小尺寸：隐藏细节 */
+    .details { display: none; }
+    
+    /* 当 SVG 容器被拉宽到大于 400px 时：显示细节 */
+    @media (min-width: 400px) {
+      .details { display: block; }
+    }
+  </style>
+  
+  <circle cx="50" cy="50" r="40" fill="red" />
+  <!-- 这些星星在手机上看不见，在电脑上自动出现 -->
+  <g class="details">
+    <polygon points="..." fill="yellow" />
+    <polygon points="..." fill="yellow" />
+  </g>
+</svg>
+```
+通过这种技术，数据可视化团队可以交付一个“万能图表组件”，它在手机上只显示大盘折线，在电脑上自动浮现出坐标轴、网格线和数据标签，而无需写任何 JavaScript 判断逻辑。

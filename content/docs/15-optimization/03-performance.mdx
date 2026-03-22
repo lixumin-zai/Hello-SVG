@@ -1,0 +1,44 @@
+---
+title: '15.3 渲染性能与边界'
+description: '当 SVG 遭遇性能瓶颈：DOM 数量爆炸与滤镜的代价'
+icon: 'Activity'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { PerformanceVisualizer } from '@/components/docs/15-optimization/performance/PerformanceVisualizer';
+
+文件体积小并不意味着渲染就快。
+由于 SVG 是基于 DOM 的，这意味着 `<svg>` 内部的每一个 `<path>`、`<circle>` 都会被浏览器解析为一个真实的 DOM 节点，参与布局计算、重排和内存分配。
+
+## 性能实验室：DOM 爆炸的后果
+
+拖动下方的滑块增加画布中**带动画的圆点数量**。注意观察右侧的 FPS（每秒帧数）变化。当你把数量拉到几千个时，你的浏览器可能会开始明显卡顿。
+
+<PerformanceVisualizer />
+
+---
+
+## 性能杀手排行榜
+
+在开发大型复杂图形（尤其是数据可视化或地图）时，你需要警惕以下几个“性能杀手”：
+
+### No.1 庞大的 DOM 节点数
+如上图所示，当独立节点超过 1000~2000 个时，DOM 开销会变得非常昂贵。
+* **解法**：如果图形是静态的，尽量在导出时**合并图层**为一个 `<path>`；如果涉及海量动态数据点（比如包含十万个点的散点图），请**果断放弃 SVG，改用 Canvas 甚至 WebGL**。
+
+### No.2 过度使用 SVG 滤镜
+我们在第八部分见识过 `feGaussianBlur`、`feDisplacementMap` 的强大，但它们需要浏览器进行极其复杂的逐像素计算（尤其是在大面积元素上应用模糊时）。
+* **解法**：尽量使用 CSS 的 `filter` 和 `backdrop-filter`（它们通常有更好的硬件加速）；或者缩小滤镜的作用区域。
+
+### No.3 `<use>` 的滥用
+`<use>` 会创建 Shadow DOM。如果一个页面中渲染了几百上千个 `<use>`，浏览器依然需要维护庞大的隐藏 DOM 树，其性能损耗不容小觑。
+
+---
+
+## 性能优化的最后手段
+
+如果必须使用 SVG 且遭遇了性能瓶颈，可以尝试以下 Hack 技巧：
+
+1. **`will-change` 提示**：对于需要做复杂位移、缩放动画的 SVG 元素，可以加上 CSS `will-change: transform;` 强制浏览器为其创建独立的 GPU 合成层。
+2. **虚拟化 (Virtualization)**：如果你的 SVG 地图超级大，只渲染当前视口 (Viewport) 内的 `<path>` 元素，随着用户的拖拽实时销毁和创建节点（类似于长列表虚拟滚动的思想）。
+3. **降级策略**：在用户进行拖拽 (Pan) 或缩放 (Zoom) 时，暂时隐藏复杂的细节图层，停止耗性能的滤镜和动画，等手势结束后再恢复。

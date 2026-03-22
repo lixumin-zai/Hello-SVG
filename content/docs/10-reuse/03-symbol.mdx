@@ -1,0 +1,43 @@
+---
+title: '10.3 终极组件化 (symbol)'
+description: '利用 <symbol> 制作可完美缩放的 SVG 组件'
+icon: 'Component'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+## 为什么需要 `<symbol>`？
+
+在上一节我们知道，使用 `<use>` 克隆 `<g>` 元素时，它仅仅是把原来的形状原封不动地搬过来。如果你尝试设置不同的宽高，不仅不会等比缩放，反而会被裁剪掉。
+
+为了解决 `<use>` 无法缩放的痛点，SVG 引入了 `<symbol>`。
+`<symbol>` 可以被看作是一个**自带了 `viewBox` 的 `<defs>` 分组**。
+
+```xml
+<defs>
+  <!-- 注意这里的 viewBox 属性 -->
+  <symbol id="icon-github" viewBox="0 0 24 24">
+    <path d="M12 2C6.477...Z" fill="currentColor" />
+  </symbol>
+</defs>
+```
+
+当你 `<use>` 一个 `<symbol>` 时，奇迹发生了：你可以在 `<use>` 标签上像使用普通图片一样设置 `width` 和 `height`，SVG 引擎会自动根据 `symbol` 内部的 `viewBox` 把图形完美地等比缩放进去！
+
+```xml
+<!-- 渲染为 16x16 大小 -->
+<use href="#icon-github" x="10" y="10" width="16" height="16" />
+
+<!-- 渲染为 48x48 大小 -->
+<use href="#icon-github" x="50" y="50" width="48" height="48" />
+```
+
+## 现代前端中的 SVG Sprite
+
+**这也是现代前端工程中 SVG Sprite (精灵图) 的核心原理**：
+把几百个图标打包成一个个带有 `id` 和 `viewBox` 的 `<symbol>`，统一放在页面顶部的 `<svg style="display: none;">` 中。
+然后在各个 React/Vue 组件中通过 `<use href="#icon-xxx" width="16" height="16">` 随时召唤它们。
+
+<Callout type="tip" title="currentColor 的魔法">
+  配合 <code>fill="currentColor"</code>，你还可以让 <code>&lt;use&gt;</code> 出来的图标继承父级元素的文本颜色（比如 <code>color: red;</code>），这使得 SVG 图标变得极其灵活！
+</Callout>

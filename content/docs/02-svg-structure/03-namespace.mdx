@@ -1,0 +1,94 @@
+---
+title: '2.3 命名空间与扩展'
+description: '理解 xmlns，以及如何在 SVG 中安全地使用自定义数据和混合其他 XML 方言'
+icon: 'Braces'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+如果你打开从 Illustrator 或 Figma 导出的 SVG 文件，你经常会看到 `<svg>` 标签上挂着一大堆以 `xmlns:` 开头的属性。这一节我们将揭开它们的神秘面纱。
+
+## 什么是 XML 命名空间 (xmlns)？
+
+由于 SVG 基于 XML，而 XML 允许用户自定义任何标签（比如 `<apple>`、`<book>`）。如果把两个不同的 XML 文档合并，很容易发生**标签冲突**（比如 SVG 的 `<title>` 标签和 HTML 的 `<title>` 标签意思完全不同）。
+
+**命名空间（Namespace）**就是为了解决这个问题而诞生的。它通过一个唯一的 URI 来声明“这个标签属于哪个规范”。
+
+### 默认 SVG 命名空间
+
+```xml
+<svg xmlns="http://www.w3.org/2000/svg">
+  <!-- 这里的元素都被认为属于 SVG 规范 -->
+</svg>
+```
+
+这是最核心的属性。如果没有它：
+* 作为独立 `.svg` 文件在浏览器中打开时，浏览器会把它当成普通 XML 文本渲染，而不是画出图形。
+* 使用 `document.createElement('circle')` 在 JS 中动态创建 SVG 元素时会失败，必须使用 `document.createElementNS('http://www.w3.org/2000/svg', 'circle')`。
+
+<Callout type="info" title="为什么在 HTML5 中可以省略？">
+  现代 HTML5 解析器非常聪明，当它在 HTML 文档中遇到 `<svg>` 标签时，会自动将其内部所有元素推断为 SVG 命名空间。因此，在内联 SVG 时，你可以安全地删除 `xmlns` 属性以精简代码。
+</Callout>
+
+## XLink 命名空间 (历史遗留)
+
+在旧版本的 SVG 中，如果你想引入外部资源（比如图片、或者复用另一个 SVG 节点），必须使用 `xlink:href` 属性。
+
+```xml
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <image xlink:href="logo.png" />
+  <use xlink:href="#my-icon" />
+</svg>
+```
+
+<Callout type="warn" title="SVG 2.0 已废弃 XLink">
+  在现代开发中（SVG 2.0），<code>xlink:href</code> 已经被废弃，你可以直接使用原生的 <code>href</code> 属性。<br/>
+  <code>&lt;use href="#my-icon" /&gt;</code> <br/>
+  因此，<code>xmlns:xlink</code> 声明也可以从你的现代 SVG 文件中删除了！
+</Callout>
+
+## SVG 与其他语言的混合 (MathML / HTML)
+
+命名空间的强大之处在于允许在同一个文档中混合使用多种 XML 语言。
+
+最典型的例子是使用 `<foreignObject>` 标签。通过声明 HTML 的命名空间，我们可以在 SVG 中直接嵌入标准的 HTML 元素（如自动换行的段落、复杂的表单组件）：
+
+```xml
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- SVG 图形 -->
+  <circle cx="100" cy="100" r="100" fill="blue" />
+  
+  <!-- 嵌入 HTML -->
+  <foreignObject x="20" y="20" width="160" height="160">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="color: white; font-family: sans-serif;">
+      <h1>这是 HTML</h1>
+      <p>这段文字支持自动换行，这在纯 SVG 中是非常难以实现的！</p>
+    </div>
+  </foreignObject>
+</svg>
+```
+
+## 自定义数据属性 (data-*)
+
+在开发交互式 SVG（如 D3.js 数据可视化或交互式地图）时，我们经常需要把业务数据绑定到具体的 SVG 节点上（例如省份的 ID、销售额等）。
+
+与 HTML 一样，SVG 完美支持 `data-*` 属性。这些属性完全合法，不会影响渲染，且极易通过 JavaScript 读取。
+
+```xml
+<svg xmlns="http://www.w3.org/2000/svg">
+  <!-- 在地图路径上绑定业务数据 -->
+  <path 
+    id="province-gd" 
+    data-adcode="440000" 
+    data-sales="50000" 
+    d="M10...Z" 
+    class="interactive-region" 
+  />
+</svg>
+```
+
+在 JS 中读取：
+```javascript
+const gdPath = document.getElementById('province-gd');
+console.log(gdPath.dataset.adcode); // 输出 "440000"
+```

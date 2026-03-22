@@ -1,0 +1,42 @@
+---
+title: '14.1 图标设计与currentColor规范'
+description: '构建现代化 SVG 图标系统的基础：ViewBox 统一与 currentColor 魔法'
+icon: 'PenTool'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Cards, Card } from 'fumadocs-ui/components/card';
+import { CurrentColorVisualizer } from '@/components/docs/14-icon-system/design/CurrentColorVisualizer';
+
+在现代 Web 开发中，传统的 Iconfont (字体图标) 正在被全面淘汰，取而代之的是更加清晰、灵活、无障碍的 **SVG 图标系统**。
+要构建一套好用的 SVG 图标库，第一步是规范图标的设计。
+
+## 1. 统一的 ViewBox
+
+不要让你的系统里混杂着 `viewBox="0 0 1024 1024"`、`viewBox="0 0 200 200"` 和 `viewBox="0 0 24 24"` 的图标。
+**请强制所有图标使用相同的 viewBox（推荐 24x24 或 16x16）**。
+
+统一 viewBox 的好处：
+1. **默认大小一致**：不需要为每个图标单独写 CSS 微调大小。
+2. **描边粗细一致**：在 `stroke-width="2"` 时，所有的图标看起来粗细是均匀的。
+
+## 2. currentColor 的魔法
+
+如果你把 SVG 的 `fill` 或 `stroke` 属性写死为 `#FF0000`，这个图标在暗色模式下可能就看不清了。
+**currentColor** 是 CSS 中的一个关键字，它表示“当前元素继承的文本颜色”。把它用在 SVG 中，是图标自适应主题的终极秘诀！
+
+### 交互探索：继承外部文本样式
+
+在下方的实验室中，试着修改外层容器的颜色和字号，观察 SVG 图标是如何自动“融入”文本环境的。
+
+<CurrentColorVisualizer />
+
+---
+
+### 设计原则总结
+
+<Cards>
+  <Card title="路径简化" description="在导出 SVG 前，合并图层，将文字转为路径，并尽可能减少锚点数量以减小文件体积。" />
+  <Card title="清除无用属性" description="删除设计软件自动生成的 width、height、fill 等硬编码属性，交由 CSS 控制。" />
+  <Card title="描边 vs 填充" description="线框风格图标使用 stroke='currentColor' fill='none'；面性风格图标使用 fill='currentColor' stroke='none'。" />
+</Cards>

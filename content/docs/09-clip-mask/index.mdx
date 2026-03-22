@@ -1,0 +1,33 @@
+---
+title: '9.1 裁剪与蒙版概览'
+description: '彻底搞懂 clipPath 和 mask 的区别，以及如何在 SVG 中给图片套上异形相框'
+icon: 'Scissors'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Cards, Card } from 'fumadocs-ui/components/card';
+import { ClipMaskComparator } from '@/components/docs/09-clip-mask/compare/ClipMaskComparator';
+
+在 UI 设计中，我们经常需要把一张方形的照片放进一个圆角矩形、圆形、甚至是不规则的星形相框里。
+在 SVG 中，实现这个需求有两个工具：**裁剪路径 (clipPath)** 和 **蒙版 (mask)**。
+
+很多人对这两个概念感到混淆，不知道什么时候该用哪一个。本节我们就来彻底弄懂它们！
+
+## 交互探索：裁剪 vs. 蒙版
+
+请在下方的演示器中切换三种不同的模式，并拖动滑块改变星星的位置、大小、透明度和颜色，观察右侧照片是如何被“切”出来的。
+
+<ClipMaskComparator />
+
+---
+
+## 核心区别总结
+
+<Cards>
+  <Card title="裁剪路径 (clipPath) ✂️" href="/docs/09-clip-mask/02-clip-path">
+    二元逻辑，非黑即白。只关心图形几何边界，不关心颜色和透明度。性能极高。
+  </Card>
+  <Card title="蒙版 (mask) 👻" href="/docs/09-clip-mask/03-mask">
+    不仅决定“哪里显示”，还决定“显示多少”。支持透明度和颜色亮度，可实现渐变遮罩。
+  </Card>
+</Cards>

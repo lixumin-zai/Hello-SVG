@@ -1,0 +1,55 @@
+---
+title: '17.3 交互式 SVG 地图'
+description: '将无生命的矢量图形转化为数据驱动的动态监控大屏'
+icon: 'Map'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { MapInteractiveVisualizer } from '@/components/docs/17-interactive/maps/MapInteractiveVisualizer';
+
+在 B 端业务和政务系统中，“数据大屏”是非常高频的需求。其中，**交互式 SVG 地图**（比如显示全国各省份的销量、或者商场平面图的人流热力）是最核心的组件之一。
+
+## 交互探索：数据驱动的区域监控
+
+请将鼠标悬停在左侧地图的不同区块上，观察右侧的数据面板是如何与 SVG 图形实时联动的。
+
+<MapInteractiveVisualizer />
+
+---
+
+## 实现沉浸式地图的关键步骤
+
+要实现上述效果，通常需要遵循以下工程范式：
+
+### 1. 结构化 SVG 数据
+不要直接把一个巨大的含有几百个随机 `id` 的 `<path>` 的 SVG 文件丢进项目。
+你需要把地图数据处理成 JSON 或 React 组件数组：
+
+```javascript
+// 好的数据结构
+const regions = [
+  { id: 'beijing', name: '北京', d: 'M100,50...', sales: 5000 },
+  { id: 'shanghai', name: '上海', d: 'M120,80...', sales: 8000 }
+];
+```
+
+### 2. 状态驱动渲染 (React/Vue)
+将 `hoveredRegionId` 存入组件的 State 中。
+在渲染 `<path>` 时，根据当前选中的 ID，动态计算它的 `fill`、`stroke`、`opacity`，甚至添加 CSS `drop-shadow` 滤镜来实现高亮效果。
+
+```jsx
+<path 
+  d={region.d} 
+  fill={getHeatmapColor(region.sales)}
+  opacity={hoveredId === region.id ? 1 : 0.5}
+  onMouseEnter={() => setHoveredId(region.id)}
+/>
+```
+
+### 3. 数据映射到颜色 (Color Scale)
+地图的可视化精髓在于“热力映射”。你需要一个算法（比如 D3.js 的 `d3.scaleLinear`），把业务数据（如销量 0~10000）平滑地映射到一个颜色区间（如从浅蓝 `#e0f2fe` 到深蓝 `#1e3a8a`），然后把这个颜色动态赋给 SVG 的 `fill` 属性。
+
+<Callout type="tip" title="进阶：GeoJSON 到 SVG">
+  如果你需要绘制真实的地球仪或精确的国家地图，手动画 SVG 是不可能的。
+  业界标准做法是下载开源的 **GeoJSON** 地理数据文件，然后使用 D3.js 的 `d3.geoPath()` 和各种地图投影算法（如墨卡托投影），用 JavaScript 实时将经纬度坐标转换成 SVG 的 `d` 属性路径指令！
+</Callout>

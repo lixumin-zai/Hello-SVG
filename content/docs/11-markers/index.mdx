@@ -1,0 +1,36 @@
+---
+title: '11.1 标记 (Markers) 概览'
+description: '在路径的关键节点上自动添加箭头、圆点等标记物'
+icon: 'Target'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Cards, Card } from 'fumadocs-ui/components/card';
+import { MarkerLab } from '@/components/docs/11-markers/playground/MarkerLab';
+
+## 什么是 Marker？
+
+`<marker>` 元素就像是在路径（Path）上盖章的图章。当你有一条复杂的曲线或折线，并希望在它的**起点、中间转折点或终点**自动添加箭头、圆点或特定图标时，不需要手动计算坐标去摆放这些图形，只需要定义一个 `<marker>`，然后通过 CSS 属性应用到路径上即可。
+
+<Cards>
+  <Card title="🎯 自动对齐与旋转" description="可以根据路径的切线方向自动旋转标记物（比如箭头自动指向曲线延伸方向）。" />
+  <Card title="📏 智能缩放" description="默认情况下，标记物的大小会随着路径线条粗细（stroke-width）的变化而自动等比缩放。" />
+  <Card title="🔄 一次定义，多次使用" description="像 <defs> 一样，标记物定义一次后可以应用到无数条路径上。" />
+</Cards>
+
+---
+
+## 标记实验室 (Marker Lab)
+
+Marker 虽好，但它有几个极其容易让人抓狂的属性：`refX`/`refY` (决定怎么对齐)、`markerUnits` (决定怎么缩放) 和 `orient` (决定怎么旋转)。
+
+下面这个实验室帮你直观地理解这些属性，**自己动手拖拽滑块感受一下**！👇
+
+<MarkerLab />
+
+<Callout type="warn" title="为什么我的箭头偏离了线段？">
+  **99% 的原因是因为 `refX` 和 `refY` 没设对！**<br/>
+  `refX` 和 `refY` 定义了 Marker 内部坐标系的哪个点应该**“钉”在**路径的端点上。如果你的箭头尖端在 Marker 坐标系中的坐标是 `(10, 5)`，那么你必须设置 `refX="10"` 和 `refY="5"`，这样箭头尖端才能精准地对准线段末尾，而不是箭头的左上角对准线段末尾。
+</Callout>
+
+了解更多 Marker 的属性和配置，请看 [核心属性解析](/docs/11-markers/02-marker-attributes)。

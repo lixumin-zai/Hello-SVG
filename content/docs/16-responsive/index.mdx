@@ -1,0 +1,32 @@
+---
+title: '16.1 响应式 SVG 概览'
+description: '超越流式布局，探索 SVG 独有的多维度响应式特性'
+icon: 'Smartphone'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Cards, Card } from 'fumadocs-ui/components/card';
+
+在 HTML 和 CSS 中，我们谈论“响应式设计”（Responsive Web Design）通常指的是使用百分比宽度、Flex/Grid 布局以及 `@media` 查询来让页面适应不同的屏幕尺寸。
+
+但 SVG 的响应式要比这深刻得多。SVG 内部自带一套坐标系统，它不仅能像图片一样随容器缩放，还能**根据容器尺寸动态暴露或隐藏内部的细节**。
+
+## SVG 响应式的两个层次
+
+<Cards>
+  <Card title="1. 视口与尺寸响应 (ViewBox)" href="/docs/16-responsive/02-viewbox-responsive">
+    通过动态修改 viewBox 或使用 preserveAspectRatio，让同一个图形在不同长宽比的容器中展现不同的剪裁或缩放逻辑。
+  </Card>
+  <Card title="2. 媒体查询响应 (@media)" href="/docs/16-responsive/03-media-queries">
+    SVG 文件内部可以自带独立的 CSS 媒体查询，它能感知操作系统的暗黑模式，甚至感知自己所在容器的尺寸变化。
+  </Card>
+</Cards>
+
+---
+
+## 为什么要让 SVG 响应式？
+
+传统的响应式图片（如 `<picture>` 配合 `srcset`）需要你准备 3 张不同尺寸的 JPG 文件（大、中、小）。
+而**一个设计良好的响应式 SVG** 只需要一个文件，它能在手机上只显示极简的 Logo，在桌面上自动展开显示完整的 Slogan 和复杂装饰细节，且无论怎么缩放都不会失真。
+
+这就是 SVG 在现代跨平台 Web 开发中的降维打击能力。

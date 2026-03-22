@@ -1,0 +1,51 @@
+---
+title: '18.2 语义与屏幕阅读器'
+description: '使用 title, desc 和 aria 属性，让 SVG "开口说话"'
+icon: 'MessageSquareText'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { AccessibilityVisualizer } from '@/components/docs/18-accessibility/semantics/AccessibilityVisualizer';
+
+在普通的 HTML 中，我们给 `<img>` 标签添加 `alt` 属性来描述图片。但在 SVG 中，我们有更强大、更结构化的方式来提供语义信息：**`<title>`** 和 **`<desc>`** 标签。
+
+## 交互探索：机器眼中的 SVG
+
+点击下方按钮切换到“屏幕阅读器模式”，看看一段看似普通的 SVG 饼图代码，在 VoiceOver 等辅助工具眼中被解析成了什么结构。
+
+<AccessibilityVisualizer />
+
+---
+
+## 编写无障碍 SVG 的标准范式
+
+如果你希望一个复杂的 SVG（比如图表）能被各种老旧和现代的屏幕阅读器完美解析，请遵循以下标准结构：
+
+### 1. 设置 `role="img"`
+首先，必须告诉浏览器这是一个“整体的图像”，否则某些阅读器会试图进去朗读每一个 `<path>`。
+```xml
+<svg role="img" ...>
+```
+
+### 2. 添加 `<title>` 和 `<desc>`
+- `<title>`：简短的标题（相当于 `alt`）。在某些浏览器中，鼠标悬停时会显示为原生的 Tooltip。
+- `<desc>`：详细的描述信息（Description）。
+
+**注意：这两个标签必须放在 `<svg>` 内部的最前面！**
+
+### 3. 使用 `aria-labelledby` 建立关联
+这是最关键的一步。为了确保所有屏幕阅读器都能把外层 `<svg>` 和内部的 `<title>` 关联起来，我们需要给它们加上 `id`。
+
+```xml
+<svg role="img" aria-labelledby="svg-title svg-desc" viewBox="0 0 100 100">
+  <title id="svg-title">2023年销售额柱状图</title>
+  <desc id="svg-desc">图表显示，第一季度销售额最低，第四季度达到全年最高点。</desc>
+  
+  <!-- 具体的图形代码 -->
+  <rect ... />
+</svg>
+```
+
+<Callout type="tip" title="文本元素的特殊处理">
+  如果你的 SVG 里有 `<text>` 标签，屏幕阅读器通常能直接读出来。但如果你为了视觉效果把文本转成了轮廓路径 (Path)，一定要记得在外面包一层 `<g role="text" aria-label="真实的文字内容">`。
+</Callout>

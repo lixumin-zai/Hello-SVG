@@ -1,0 +1,45 @@
+---
+title: '8.8 投影、发光与 Gooey 特效'
+description: '组合使用滤镜原语，打造现代 UI 中最常用的三种高级特效'
+icon: 'Sparkles'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { ShadowGlowPlayground } from '@/components/docs/08-filters/shadow/ShadowGlowPlayground';
+
+单个滤镜原语的能力有限，但当我们像搭积木一样把它们组合起来（使用 `<feMerge>` 或 `<feComposite>`），就能创造出现代 UI 设计中最受欢迎的特效。
+
+## 交互探索：三大经典特效
+
+请在下方依次体验三种特效。特别注意：**在第三个 Gooey 选项卡中，请用鼠标拖动右侧画布里的小圆，让它靠近大圆！**
+
+<ShadowGlowPlayground />
+
+---
+
+## 经典配方解析
+
+### 1. 真实投影 (Drop Shadow)
+以前我们需要用 `feOffset` + `feGaussianBlur` + `feMerge` 三个原语组合才能画出一个阴影。
+现在，现代浏览器支持了更简单的专属原语 **`<feDropShadow>`**，它可以一行代码搞定：
+```xml
+<feDropShadow dx="10" dy="10" stdDeviation="5" flood-color="black" flood-opacity="0.5" />
+```
+**它比 CSS `box-shadow` 强在哪？**
+CSS 的阴影只能投射在元素的矩形边框上。而 SVG 的投影会**完美贴合图形的真实几何边缘**，哪怕是一个极其复杂的镂空五角星。
+
+### 2. 霓虹发光 (Neon Glow)
+发光效果其实就是“彩色的、没有偏移的、多次叠加的投影”。
+核心配方：
+1. 提取图形轮廓，填上发光颜色。
+2. 进行大范围高斯模糊。
+3. **关键步骤**：使用 `<feMerge>` 把模糊后的光晕**重复叠加多次**，这样中心会更亮，边缘逐渐衰减，产生极其逼真的霓虹灯效果。
+4. 最后把原图盖在最上面。
+
+### 3. Gooey (融合/粘滞) 特效
+这是前端动画界最著名的“黑魔法”。当你需要做水滴融合、加载动画、或者果冻风格的弹出菜单时，这个滤镜是唯一解。
+
+**核心配方：先极度模糊，再极度锐化**
+1. `<feGaussianBlur stdDeviation="10">`：把两个靠近的图形模糊掉。此时它们的边缘会交融在一起，变成半透明的过渡带。
+2. `<feColorMatrix type="matrix">`：通过修改 Alpha 通道，设置一个极其陡峭的阈值（比如公式中的 `0 0 0 19 -9`）。它会把半透明的像素强制变成完全不透明，把透明度极低的像素直接砍掉。
+3. 结果就是：原本模糊的交融地带，重新变成了拥有锐利边缘的“粘连桥梁”！

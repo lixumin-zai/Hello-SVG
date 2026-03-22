@@ -1,0 +1,46 @@
+---
+title: '18.1 SVG 可访问性 (A11y) 概览'
+description: '不要让你的图形成为视障用户的黑洞，为 SVG 添加语义和结构'
+icon: 'EyeOff'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Cards, Card } from 'fumadocs-ui/components/card';
+
+当一个普通用户看到一个带红叉的圆圈时，他立刻知道这意味着“错误”或“删除”。
+但对于使用屏幕阅读器（Screen Reader）的视障用户来说，如果你的 SVG 代码只有 `<circle>` 和 `<path>`，屏幕阅读器可能会直接跳过它，或者念出一串毫无意义的标签名。
+
+**无障碍设计 (Accessibility, 简称 a11y)**，就是让机器能够理解你的图形意图。
+
+## 可访问性的两大维度
+
+<Cards>
+  <Card title="1. 语义与屏幕阅读" href="/docs/18-accessibility/02-semantics">
+    通过 title、desc 和 aria 属性，告诉屏幕阅读器这幅图到底画了什么。
+  </Card>
+  <Card title="2. 键盘导航与焦点" href="/docs/18-accessibility/03-keyboard-navigation">
+    针对无法使用鼠标的用户，让 SVG 内部的可交互元素能够通过 Tab 键访问。
+  </Card>
+</Cards>
+
+---
+
+## 装饰性 vs. 信息性图形
+
+在开始添加复杂的无障碍标签之前，首先要问自己一个问题：**这个 SVG 图形的作用是什么？**
+
+### 1. 纯装饰性图形 (Decorative)
+比如一个漂亮的背景波浪、一个按钮旁边为了好看而加的箭头图标。这类图形**不承载任何核心业务信息**，如果没有它，用户依然能理解页面的意思。
+
+**处理方式**：让屏幕阅读器彻底忽略它！
+```xml
+<!-- 给外层添加 aria-hidden="true" -->
+<svg aria-hidden="true" viewBox="...">
+  <path d="..." />
+</svg>
+```
+
+### 2. 信息性图形 (Informative)
+比如一个显示销量的折线图、一个表示“警告”状态的图标。这类图形传达了**不可或缺的信息**。
+
+**处理方式**：必须添加语义标签。接下来的章节我们将详细探讨如何处理这类图形。

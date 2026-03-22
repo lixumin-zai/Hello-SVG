@@ -1,0 +1,50 @@
+---
+title: '20. SVG 工具生态与工作流'
+description: '工欲善其事，必先利其器：从设计到开发的 SVG 工具链盘点'
+icon: 'Wrench'
+---
+
+import { Cards, Card } from 'fumadocs-ui/components/card';
+import { Callout } from 'fumadocs-ui/components/callout';
+
+虽然我们花了大量篇幅学习如何手写 SVG 代码，但在日常的工业化生产中，大多数复杂的图形都是由设计软件生成，并由自动化工具链进行处理的。
+构建一条顺畅的“设计 -> 开发”工作流，是团队高效使用 SVG 的关键。
+
+## 1. 设计工具 (Design Tools)
+
+前端开发者不需要成为设计师，但了解设计师使用什么工具，以及如何从这些工具中**正确导出 SVG**，能帮你避免无数的坑。
+
+<Cards>
+  <Card title="Figma" href="https://www.figma.com/" target="_blank">
+    **现代 UI 设计的绝对霸主**。Figma 导出的 SVG 代码非常干净，没有早期 Adobe 软件那种臃肿的历史包袱。它支持直接复制选中元素为 SVG 代码。
+  </Card>
+  <Card title="Adobe Illustrator (AI)" href="https://www.adobe.com/products/illustrator.html" target="_blank">
+    **传统矢量插画的行业标准**。非常适合绘制极其复杂的路径。**注意**：导出时务必选择 `Export As...`（导出为），而不要使用 `Save As`（另存为），后者会包含大量 Adobe 专有的脏代码。
+  </Card>
+  <Card title="Inkscape" href="https://inkscape.org/" target="_blank">
+    **最强大的开源免费矢量编辑器**。它的原生保存格式就是 SVG！如果你是一个喜欢自己鼓捣图形的独立开发者，强烈推荐。
+  </Card>
+</Cards>
+
+## 2. 优化与调试工具 (Optimization & Debugging)
+
+设计师交付的 SVG 文件往往不能直接用于生产环境，我们需要工具来“清洗”它们。
+
+<Cards>
+  <Card title="SVGOMG" href="https://jakearchibald.github.io/svgomg/" target="_blank">
+    **SVGO 的在线可视化版本**。前端必收录的书签！把设计稿拖进去，勾选右侧的优化选项，直观地看着体积减小，然后一键复制优化后的代码。
+  </Card>
+  <Card title="SVG Path Editor" href="https://yqnn.github.io/svg-path-editor/" target="_blank">
+    **路径调试神器**。当你看着一段由 `M, C, Q, Z` 组成的乱码般的 `<path>` 感到绝望时，把它粘贴到这个网站，它会把每一个控制点可视化出来，甚至允许你拖拽修改并实时生成新代码。
+  </Card>
+</Cards>
+
+## 3. 现代前端构建工具 (Build Tools)
+
+在 Vite 或 Webpack 时代，我们不应该再手动复制粘贴 SVG 代码到组件里了。
+
+- **`vite-svg-loader` (Vue)** / **`@svgr/rollup` (React)**：
+  这类插件允许你将 `.svg` 文件直接作为组件导入。它们在底层调用了 SVGO 进行优化，并转换为 JSX/Template 渲染函数。
+  
+- **`vite-plugin-svg-icons`**：
+  专门用于构建 SVG Sprite 的神器。你只需要把所有图标放在 `src/icons` 目录下，它会自动在构建时把它们打包成一个完美的 `<svg><defs>...` 注入到 HTML 中。

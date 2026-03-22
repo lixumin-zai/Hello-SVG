@@ -1,0 +1,67 @@
+---
+title: '12.2 CSS 动画'
+description: '使用 CSS 和 keyframes 让 SVG 动起来'
+icon: 'Palette'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+## CSS 动画基础
+
+在现代前端开发中，用 CSS 控制 SVG 动画是最符合组件化开发直觉的方式。
+你可以像控制普通 HTML 元素一样，使用 `transition` 和 `@keyframes` 控制 SVG 元素的属性。
+
+```css
+.my-circle {
+  fill: blue;
+  transition: fill 0.3s ease;
+}
+
+.my-circle:hover {
+  fill: red;
+}
+```
+
+## 经典套路：画线动画 (Line Drawing)
+
+利用 `stroke-dasharray` 和 `stroke-dashoffset` 这对黄金搭档：
+1. 先计算出路径的总长度（可以通过 JS 的 `path.getTotalLength()` 获得，或使用一个足够大的近似值）。
+2. 将虚线的每段实线和空白长度（`stroke-dasharray`）都设置为总长度。
+3. 将虚线的偏移量（`stroke-dashoffset`）设置为总长度（此时线条被推到了视口之外，看不见）。
+4. 用 CSS 动画将 `stroke-dashoffset` 慢慢减小到 0，线条就会像用笔画出来一样出现！
+
+```css
+.draw-line {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: draw 2s ease forwards;
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+```
+
+## Transform Origin 陷阱 ⚠️
+
+在 HTML 元素中，CSS 的 `transform-origin` 默认是元素的中心点（`50% 50%`）。但在 SVG 中，如果对内部的 `<rect>` 或 `<g>` 使用 CSS 旋转：
+- **默认的 `transform-origin` 是整个 SVG 画布的左上角 (0, 0)！**
+- 如果你试图用 `50% 50%`，它通常指的是画布的中心，而不是元素自己的中心。
+
+**💡 终极解法**：在 CSS 中加上 `transform-box: fill-box;`，这样浏览器就会以元素自身的边界框（Bounding Box）来计算中心点了！
+
+```css
+.spin-icon {
+  transform-origin: center;
+  transform-box: fill-box; /* 救命恩人 */
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+```

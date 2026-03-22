@@ -1,0 +1,50 @@
+---
+title: '17.2 画布平移与缩放 (Pan & Zoom)'
+description: '实现无限画布的核心：操控 viewBox 的艺术'
+icon: 'Move'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { PanZoomVisualizer } from '@/components/docs/17-interactive/pan-zoom/PanZoomVisualizer';
+
+在构建类似在线白板（如 Excalidraw）、流程图编辑器或地图导航系统时，**无限画布 (Infinite Canvas)** 体验是必不可少的。
+在 SVG 中，实现这种体验的最高效方式，不是去改变里面成千上万个元素的 `transform`，而是直接去**操纵整个 SVG 的 `viewBox`**。
+
+## 交互探索：ViewBox 操控实验室
+
+在下方的黑色画布中：
+- 按住鼠标左键**拖拽**，可以平移画面。
+- 使用**鼠标滚轮**，可以放大和缩小画面。
+注意观察左下角的 `viewBox` 数值是如何被 JavaScript 实时修改的！
+
+<PanZoomVisualizer />
+
+---
+
+## 核心数学原理
+
+`viewBox="x y width height"`
+
+### 平移 (Pan) 的数学计算
+当用户的鼠标在屏幕上向右移动了 `100px` 时，为了让画面看起来向右走，我们需要把“摄像机”（也就是 viewBox）向左移动。
+**注意**：屏幕上的 100px 并不等于 viewBox 里的 100 个单位。你需要计算当前的缩放比例。
+
+```javascript
+// 简化的平移逻辑
+let scale = viewBox.width / svgElement.clientWidth;
+let newX = currentViewBox.x - (mouseDeltaX * scale);
+let newY = currentViewBox.y - (mouseDeltaY * scale);
+```
+
+### 缩放 (Zoom) 的数学计算
+当用户向上滚动滚轮（放大）时，我们需要**减小** `viewBox` 的 `width` 和 `height`。取景框越小，看到的东西就显得越大。
+为了保证缩放是“以鼠标当前位置为中心”的，我们需要同时调整 `x` 和 `y`，以补偿尺寸变化带来的偏移（这是一个非常经典的数学坑，初学者常常在这里卡住很久）。
+
+## 推荐的开源库
+
+除非你在学习底层原理，否则在生产环境中，**强烈建议不要自己手写 Pan & Zoom 逻辑**（因为要完美处理触摸屏的双指捏合、触控板的惯性滚动、鼠标居中缩放等边缘情况极其复杂）。
+
+以下是业界标准的开源库：
+- **`d3-zoom`**：如果你已经在使用 D3.js，这是最强大、最顺滑的缩放模块。
+- **`svg-pan-zoom`**：一个老牌但依然好用的独立无依赖库。
+- **`react-zoom-pan-pinch`**：如果你使用 React，这个库提供了非常优雅的组件式封装。

@@ -1,0 +1,53 @@
+---
+title: '9.3 蒙版 (mask)'
+description: '使用 mask 实现复杂的半透明与渐变遮罩'
+icon: 'Ghost'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+## 什么是 mask？
+
+`<mask>` 就像一张可以喷涂半透明墨水的玻璃纸。蒙版不仅能决定“哪里显示”，还能决定“**显示多少（透明度）**”。
+
+蒙版分为两种工作模式（通过 `mask-type` 或 CSS `mask-type` 控制）：
+
+### 模式 A：Alpha 蒙版 (默认，现代 Web 标准)
+看的是蒙版图形的 **透明度 (Opacity)**。
+- 蒙版图形不透明 (opacity=1) 的地方，底图完全显示。
+- 蒙版图形半透明 (opacity=0.5) 的地方，底图半透明显示。
+- 蒙版图形全透明 (opacity=0) 的地方，底图隐藏。
+
+### 模式 B：亮度蒙版 (Luminance，老式 SVG 默认)
+看的是蒙版图形的 **颜色亮度 (Color Luminance)**。
+- 蒙版图形是**纯白 (#FFFFFF)** 的地方，底图完全显示。
+- 蒙版图形是**灰色**的地方，底图半透明显示。
+- 蒙版图形是**纯黑 (#000000)** 的地方，底图隐藏。
+
+## 渐变蒙版魔法 🪄
+
+因为蒙版支持透明度和颜色的过渡，所以我们经常**把一个带渐变的矩形作为蒙版**，盖在一张图片上，从而非常轻松地实现“图片边缘逐渐淡出融入背景”的高级视觉效果！
+
+```xml
+<svg viewBox="0 0 200 200">
+  <defs>
+    <!-- 定义一个从白到黑的渐变 -->
+    <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="white" />
+      <stop offset="100%" stop-color="black" />
+    </linearGradient>
+
+    <!-- 定义蒙版 -->
+    <mask id="my-mask">
+      <rect x="0" y="0" width="200" height="200" fill="url(#fade)" />
+    </mask>
+  </defs>
+
+  <!-- 应用蒙版 -->
+  <image 
+    href="photo.jpg" 
+    width="200" height="200" 
+    mask="url(#my-mask)" 
+  />
+</svg>
+```

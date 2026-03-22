@@ -1,0 +1,109 @@
+---
+title: '23.4 实战：简易矢量画板'
+description: '挑战高阶交互：实现拖拽创建与移动 SVG 元素的画板核心逻辑'
+icon: 'PenTool'
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+如果你想开发一个像 Figma 或 Excalidraw 那样的设计工具，你需要深刻理解**屏幕坐标系与 SVG 内部用户坐标系的逆变换**。
+本案例将展示如何用 React 和原生 SVG API 实现一个“可以用鼠标拖拽移动的矩形”。
+
+## 核心挑战
+
+当你的鼠标在屏幕上移动了 `(dx, dy)` 时，你不能直接把这个值加到 SVG 元素的 `x` 和 `y` 属性上。因为如果外层的 `<svg>` 设置了 `viewBox`，或者被 CSS `transform: scale(2)` 放大了两倍，鼠标在屏幕上移动的 100px，可能只等于 SVG 内部的 50 个单位！
+
+## 终极解法：使用 CTM (Coordinate Transform Matrix)
+
+```jsx
+import { useState, useRef } from 'react';
+
+export function SvgEditor() {
+  const svgRef = useRef(null);
+  
+  // 维护图形的状态（在真实的 App 中，这会是一个复杂的数组）
+  const [rect, setRect] = useState({ x: 50, y: 50, w: 100, h: 80 });
+  
+  // 拖拽状态
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+
+  // 1. 核心坐标转换函数
+  const getMousePosition = (evt) => {
+    const CTM = svgRef.current.getScreenCTM();
+    return {
+      x: (evt.clientX - CTM.e) / CTM.a,
+      y: (evt.clientY - CTM.f) / CTM.d
+    };
+  };
+
+  // 2. 按下鼠标：开始拖拽并记录点击位置与矩形左上角的偏移量
+  const handlePointerDown = (evt) => {
+    setIsDragging(true);
+    // 强制捕获指针，即使鼠标移出矩形范围也能继续接收事件
+    evt.target.setPointerCapture(evt.pointerId);
+    
+    const mousePos = getMousePosition(evt);
+    setDragOffset({
+      x: mousePos.x - rect.x,
+      y: mousePos.y - rect.y
+    });
+  };
+
+  // 3. 移动鼠标：计算新位置
+  const handlePointerMove = (evt) => {
+    if (!isDragging) return;
+    evt.preventDefault();
+    
+    const mousePos = getMousePosition(evt);
+    setRect({
+      ...rect,
+      // 新位置 = 当前鼠标位置 - 按下时的偏移量
+      x: mousePos.x - dragOffset.x,
+      y: mousePos.y - dragOffset.y
+    });
+  };
+
+  // 4. 松开鼠标：结束拖拽
+  const handlePointerUp = (evt) => {
+    setIsDragging(false);
+    evt.target.releasePointerCapture(evt.pointerId);
+  };
+
+  return (
+    <div className="border border-border rounded-lg overflow-hidden bg-grid-pattern">
+      <svg
+        ref={svgRef}
+        viewBox="0 0 800 600"
+        className="w-full h-[400px] touch-none"
+      >
+        <rect
+          x={rect.x}
+          y={rect.y}
+          width={rect.w}
+          height={rect.h}
+          fill="#3b82f6"
+          stroke="#1e3a8a"
+          strokeWidth="4"
+          rx="8"
+          cursor={isDragging ? 'grabbing' : 'grab'}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          // 重要：如果不写 all，如果 fill 是 none 的话中间就点不到了！
+          pointerEvents="all" 
+        />
+      </svg>
+    </div>
+  );
+}
+```
+
+## 关键技术点解析
+
+1. **`getScreenCTM()`**：
+   无论 SVG 怎么缩放、视口怎么变形，这个矩阵都能完美地把浏览器屏幕的像素坐标（`clientX/Y`）转换为 SVG 内部的绝对坐标。公式中的 `CTM.e` 和 `CTM.f` 是平移量，`CTM.a` 和 `CTM.d` 是缩放比例。
+2. **偏移量记录 (`dragOffset`)**：
+   你不能把鼠标的坐标直接赋给矩形的 `x, y`（因为矩形的坐标是它的左上角）。如果你点在矩形的中心拖拽，矩形会瞬间“瞬移”使得它的左上角对齐到你的鼠标上。因此，必须在按下时记录鼠标与左上角的距离差。
+3. **`setPointerCapture`**：
+   如果你拖拽得太快，鼠标指针可能会“跑出”矩形的区域，导致 `pointermove` 事件丢失。调用这个原生 API 可以强制让浏览器把所有的鼠标事件都发送给这个矩形，直到你松开鼠标。
