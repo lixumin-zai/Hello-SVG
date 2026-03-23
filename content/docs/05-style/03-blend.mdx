@@ -6,6 +6,7 @@ icon: 'Layers'
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { BlendModePlayground } from '@/components/docs/05-style/blend/BlendModePlayground';
+import { BlendConceptsVisualizer } from '@/components/docs/05-style/blend/BlendConceptsVisualizer';
 
 除了简单的透明度（Opacity），SVG 还完全支持 CSS 的合成与混合规范。这使得我们可以直接在浏览器中实现复杂的光影叠加、正片叠底等“设计师级”的视觉效果，而不需要导出庞大的 PNG 图片。
 
@@ -19,25 +20,7 @@ import { BlendModePlayground } from '@/components/docs/05-style/blend/BlendModeP
 
 ## 核心概念
 
-### 1. 混合模式 (`mix-blend-mode`)
-
-混合模式定义了一个元素的内容应该如何与它“下面”的内容（即背景或其他早先绘制的元素）混合。它不仅可以用于 SVG 内部的元素之间，**还可以让 SVG 元素与页面上的 HTML 背景进行混合**。
-
-最常用的几种模式：
-- `multiply` (正片叠底)：结果总是比原来的颜色更暗。常用于去除白色背景、模拟阴影。
-- `screen` (滤色)：结果总是比原来的颜色更亮。常用于去除黑色背景、模拟发光效果。
-- `overlay` (叠加)：结合了 multiply 和 screen，增加对比度。
-- `difference` (差值)：非常适合做**反色游标/反色文字**。当底色是白色时变黑，底色是黑色时变白。
-
-### 2. 隔离上下文 (`isolation: isolate`)
-
-这是一个常常被忽略但极其重要的 CSS 属性。
-
-在上面的演示器中，如果你开启了 **isolation**，你会发现红、绿、蓝三个圆圈彼此之间仍然会混合（比如红色和绿色相交处变黄），**但它们不再与底部的背景图混合了**。
-
-**工作原理**：
-`isolation: isolate` 会创建一个新的“堆叠上下文（Stacking Context）”。
-系统会先在这个隔离的容器（比如 `<g>` 标签）内部完成所有的混合计算，最终生成一张临时的、扁平的图像，然后再把这张临时图像以 `normal` 模式贴到大背景上。
+<BlendConceptsVisualizer />
 
 <Callout type="tip" title="何时使用 isolation？">
   当你设计了一个由多个互相混合的形状组成的复杂 Logo 或组件，你不希望它放到用户的网页上时，因为受到用户网页深色/浅色背景的影响而改变原本的颜色，这时就必须给最外层的 <code>&lt;g&gt;</code> 加上 <code>isolation: isolate</code>。

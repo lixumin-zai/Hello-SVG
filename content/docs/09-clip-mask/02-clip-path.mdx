@@ -5,13 +5,16 @@ icon: 'Crop'
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
+import { ClipPathVisualizer } from '@/components/docs/09-clip-mask/clip/ClipPathVisualizer';
 
 ## 什么是 clipPath？
 
-`<clipPath>` 就像一把锋利的剪刀。你用剪刀剪出一个星星形状的纸板，然后盖在照片上。星星形状以内的部分 100% 显示，以外的部分 100% 隐藏。
+`<clipPath>` 就像一把锋利的剪刀。你用剪刀剪出一个形状的纸板，然后盖在照片上。形状以内的部分 100% 显示，以外的部分 100% 隐藏。
+
+<ClipPathVisualizer />
 
 *   **特性**：二元逻辑，非黑即白（要么显示，要么不显示）。
-*   **忽略外观**：不管你在 `<clipPath>` 里画的星星是什么颜色、是否半透明，统统无效！它只关心图形的**几何边界**。
+*   **忽略外观**：不管你在 `<clipPath>` 里画的图形是什么颜色、是否半透明，统统无效！它只关心图形的**几何边界**。
 *   **性能**：因为只做几何计算不涉及像素混合，渲染性能极高。
 *   **使用场景**：简单的头像裁剪、基础几何形状裁剪。
 

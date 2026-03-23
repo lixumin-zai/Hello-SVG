@@ -6,6 +6,7 @@ icon: 'Spline'
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { BezierPlayground } from '@/components/docs/04-path/bezier/BezierPlayground';
+import { BezierAnatomy } from '@/components/docs/04-path/bezier/BezierAnatomy';
 
 直线只能画出棱角分明的图形，要画出圆润、有机的形状，我们需要**贝塞尔曲线（Bézier Curve）**。
 
@@ -21,29 +22,6 @@ import { BezierPlayground } from '@/components/docs/04-path/bezier/BezierPlaygro
 
 ## 指令解析
 
-### 二次贝塞尔曲线 (Q / q)
-**语法：`Q cx cy, x y`**
+下面我们通过静态图解，深入分析这两种曲线的语法结构和控制点作用。
 
-二次贝塞尔曲线由 3 个点决定：
-1. **起点**：画笔当前所在的位置。
-2. **控制点 (cx, cy)**：决定了曲线的弯曲方向和程度。
-3. **终点 (x, y)**：曲线结束的位置。
-
-> **物理直觉**：你可以想象起点和终点之间有一根松弛的橡皮筋，你捏住控制点往外拉，橡皮筋就会跟着弯曲，但它永远不会真正碰到你的手（控制点）。
-
-### 三次贝塞尔曲线 (C / c)
-**语法：`C cx1 cy1, cx2 cy2, x y`**
-
-三次贝塞尔曲线由 4 个点决定，它比 Q 命令多了一个控制点，因此可以画出 **S 型** 的曲线。
-1. **起点**：画笔当前所在的位置。
-2. **控制点1 (cx1, cy1)**：决定了曲线**离开起点**时的切线方向。
-3. **控制点2 (cx2, cy2)**：决定了曲线**到达终点**时的切线方向。
-4. **终点 (x, y)**：曲线结束的位置。
-
-<Callout type="tip" title="T 和 S 命令 (平滑连接)">
-  当你需要画连续的波浪线时，如果每次都手动计算控制点会很麻烦。SVG 提供了快捷命令：
-  <ul>
-    <li><code>T</code>（平滑二次贝塞尔）：接在 <code>Q</code> 后面，它会自动以上一个控制点为中心对称生成新的控制点。</li>
-    <li><code>S</code>（平滑三次贝塞尔）：接在 <code>C</code> 后面，自动对称生成第一个控制点。</li>
-  </ul>
-</Callout>
+<BezierAnatomy />

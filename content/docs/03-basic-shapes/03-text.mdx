@@ -6,6 +6,7 @@ icon: 'Type'
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { TextPlayground } from '@/components/docs/03-basic-shapes/text/TextPlayground';
+import { TextCapabilitiesExplorer } from '@/components/docs/03-basic-shapes/text/TextCapabilitiesExplorer';
 
 与 HTML 中的 `<p>` 或 `<span>` 不同，SVG 的 `<text>` 元素有着完全不同的排版逻辑。它更像是图形编辑器（如 Photoshop 或 Illustrator）中的文本工具。
 
@@ -19,30 +20,6 @@ import { TextPlayground } from '@/components/docs/03-basic-shapes/text/TextPlayg
 
 ## 文本排版的核心概念
 
-### 1. 基础 `<text>` 与对齐
-在 SVG 中放置文本，你需要指定一个**锚点** `(x, y)`。
-文本如何相对于这个锚点排列，由 `text-anchor` 属性决定：
-*   `start`（默认）：文字从锚点向右展开（左对齐）。
-*   `middle`：锚点位于文字水平正中央（居中对齐）。
-*   `end`：文字在锚点左侧结束（右对齐）。
+下面我们通过交互式图解，深入理解 SVG 文本排版的三个核心特性：对齐方式、换行策略和路径文字。
 
-<Callout type="warn" title="为什么文字看不见？">
-  如果你的文字 <code>y="0"</code>，它很可能会跑到视口（Viewport）的外面去！因为 SVG 的 <code>y</code> 坐标默认对齐的是文字的**基线（baseline）**，而不是文字的顶部。
-</Callout>
-
-### 2. 致命缺点：不支持自动换行！
-这是从 HTML 转到 SVG 的开发者最容易踩的坑。**无论你给 `<text>` 设置多长的文字，它都不会自动换行**，哪怕超出了屏幕边缘。
-
-要在 SVG 中实现换行，主要有两种方案：
-1. **使用 `<tspan>` 手动换行**：通过给内部的 `<tspan>` 元素设置 `x` 和 `dy="1.2em"`（向下偏移 1.2 倍行高）来实现多行文本。这种方式适合行数固定的标题。
-2. **使用 `<foreignObject>`**：如果是一大段文章，最推荐的方式是利用 `foreignObject` 嵌入 HTML 的 `<div>` 或 `<p>` 标签，让浏览器的 HTML 引擎帮你自动换行（参考 [2.3 节](/docs/02-svg-structure/03-namespace)）。
-
-### 3. `<textPath>`：文字沿路径排列
-这是 SVG 文本最强大的特性之一。通过结合我们将在下一章学习的 `<path>`，你可以让文字像过山车一样沿着任意复杂的曲线排布。
-
-只需要三步：
-1. 在 `<defs>` 中定义一个带有 `id` 的 `<path>`。
-2. 创建一个 `<text>` 元素。
-3. 在其中放入 `<textPath href="#你的路径ID">文字内容</textPath>`。
-
-你可以通过调整 `startOffset`（起始偏移量，支持百分比）来让文字在路径上移动，这常常被用来制作环形文字徽章或文字滚动动画。
+<TextCapabilitiesExplorer />

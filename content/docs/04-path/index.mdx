@@ -6,6 +6,7 @@ icon: 'PenTool'
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { PathLinesPlayground } from '@/components/docs/04-path/lines/PathLinesPlayground';
+import { PathCommandExplorer } from '@/components/docs/04-path/lines/PathCommandExplorer';
 
 终于来到了 SVG 的核心 —— `<path>`（路径）元素。之前学过的所有形状（矩形、圆形、多边形），底层都可以用 `<path>` 画出来。它是你在 Figma 等设计软件中用“钢笔工具”画出的那条线。
 
@@ -33,6 +34,8 @@ import { PathLinesPlayground } from '@/components/docs/04-path/lines/PathLinesPl
 
 *   **大写字母（如 `M`, `L`）**：表示**绝对坐标**。`L 100 100` 意思是“画线到画布上坐标为 `x=100, y=100` 的那个确切位置”。
 *   **小写字母（如 `m`, `l`）**：表示**相对坐标**。`l 100 100` 意思是“从画笔当前所在的位置开始，向右走 100，向下走 100 画一条线”。
+
+<PathCommandExplorer />
 
 <Callout type="tip" title="为什么要用相对命令？">
   在手写或使用代码生成 SVG 时，相对命令极其好用。如果你想把一个画好的图标整体平移，只要改第一个大写的 <code>M</code>（起点位置），后面的相对指令完全不需要修改！这也使得压缩后的 SVG 文件体积更小。

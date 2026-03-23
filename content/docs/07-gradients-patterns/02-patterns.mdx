@@ -6,6 +6,7 @@ icon: 'LayoutGrid'
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { PatternPlayground } from '@/components/docs/07-gradients-patterns/patterns/PatternPlayground';
+import { PatternConceptsExplorer } from '@/components/docs/07-gradients-patterns/patterns/PatternConceptsExplorer';
 
 除了纯色和渐变，SVG 还允许你用重复的图案（Pattern）来填充图形。
 这就像在现实中贴瓷砖一样：你只需要设计好一块瓷砖（一个基础图案单元），SVG 渲染引擎就会自动帮你把它无缝平铺到整个图形上。
@@ -20,31 +21,6 @@ import { PatternPlayground } from '@/components/docs/07-gradients-patterns/patte
 
 ## 核心概念：如何贴瓷砖
 
-### 1. 定义图案 `<pattern>`
-和渐变一样，图案也必须定义在 `<defs>` 标签中。
-你需要指定这个“瓷砖”的 `width` 和 `height`。然后在标签内部，你可以写任意的 SVG 代码（画圆、画线、甚至放图片），这些内容就会成为你的基础图案单元。
+通过下方组件，了解图案定义、坐标系避坑指南以及图案变换技巧。
 
-```xml
-<defs>
-  <!-- 定义一个 20x20 的瓷砖 -->
-  <pattern id="myDots" width="20" height="20" patternUnits="userSpaceOnUse">
-    <!-- 在瓷砖中心画一个半径为 5 的蓝点 -->
-    <circle cx="10" cy="10" r="5" fill="blue" />
-  </pattern>
-</defs>
-
-<!-- 用这块瓷砖填满一个 200x200 的大矩形 -->
-<rect width="200" height="200" fill="url(#myDots)" />
-```
-
-### 2. 坐标系 (`patternUnits`)
-这是初学者最容易踩坑的地方。`<pattern>` 有两个坐标系属性：`patternUnits`（决定瓷砖尺寸的计算方式）和 `patternContentUnits`（决定瓷砖内部图形的计算方式）。
-
-**强烈建议：**
-永远把 `patternUnits` 设置为 **`userSpaceOnUse`**。
-如果不设置，它默认是 `objectBoundingBox`，这意味着你设置的 `width="20"` 会被解析为“占据目标图形宽度的 20倍”（这往往会导致图案变得巨大且变形）。使用 `userSpaceOnUse` 可以确保 20 就是 20 个像素。
-
-### 3. 图案变换 (`patternTransform`)
-这是一个非常有用的属性。
-比如你想画一个斜纹背景。最简单的方法是：先在 `<pattern>` 里画一条垂直的线，然后直接给整个 pattern 加上 `patternTransform="rotate(45)"`。
-这样 SVG 就会在平铺图案之前，先把它整体旋转 45 度！这比在瓷砖内部用数学公式去计算对角线要容易得多。
+<PatternConceptsExplorer />

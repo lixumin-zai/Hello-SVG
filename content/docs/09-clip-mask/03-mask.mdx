@@ -5,6 +5,7 @@ icon: 'Ghost'
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
+import { MaskTypesExplorer } from '@/components/docs/09-clip-mask/mask/MaskTypesExplorer';
 
 ## 什么是 mask？
 
@@ -12,17 +13,7 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 蒙版分为两种工作模式（通过 `mask-type` 或 CSS `mask-type` 控制）：
 
-### 模式 A：Alpha 蒙版 (默认，现代 Web 标准)
-看的是蒙版图形的 **透明度 (Opacity)**。
-- 蒙版图形不透明 (opacity=1) 的地方，底图完全显示。
-- 蒙版图形半透明 (opacity=0.5) 的地方，底图半透明显示。
-- 蒙版图形全透明 (opacity=0) 的地方，底图隐藏。
-
-### 模式 B：亮度蒙版 (Luminance，老式 SVG 默认)
-看的是蒙版图形的 **颜色亮度 (Color Luminance)**。
-- 蒙版图形是**纯白 (#FFFFFF)** 的地方，底图完全显示。
-- 蒙版图形是**灰色**的地方，底图半透明显示。
-- 蒙版图形是**纯黑 (#000000)** 的地方，底图隐藏。
+<MaskTypesExplorer />
 
 ## 渐变蒙版魔法 🪄
 

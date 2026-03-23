@@ -5,32 +5,16 @@ icon: 'Component'
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
+import { SymbolVsUseVisualizer } from '@/components/docs/10-reuse/symbol/SymbolVsUseVisualizer';
 
 ## 为什么需要 `<symbol>`？
 
-在上一节我们知道，使用 `<use>` 克隆 `<g>` 元素时，它仅仅是把原来的形状原封不动地搬过来。如果你尝试设置不同的宽高，不仅不会等比缩放，反而会被裁剪掉。
+在上一节我们知道，使用 `<use>` 克隆 `<g>` 元素时，它仅仅是把原来的形状原封不动地搬过来。如果你尝试设置不同的宽高，不仅不会等比缩放，反而会被生硬地裁剪掉。
 
 为了解决 `<use>` 无法缩放的痛点，SVG 引入了 `<symbol>`。
-`<symbol>` 可以被看作是一个**自带了 `viewBox` 的 `<defs>` 分组**。
+`<symbol>` 可以被看作是一个**自带了 `viewBox` 的 `<defs>` 分组**。当你 `<use>` 一个 `<symbol>` 时，你可以在 `<use>` 标签上像使用普通图片一样设置 `width` 和 `height`，SVG 引擎会自动根据 `symbol` 内部的 `viewBox` 把图形完美地等比缩放进去！
 
-```xml
-<defs>
-  <!-- 注意这里的 viewBox 属性 -->
-  <symbol id="icon-github" viewBox="0 0 24 24">
-    <path d="M12 2C6.477...Z" fill="currentColor" />
-  </symbol>
-</defs>
-```
-
-当你 `<use>` 一个 `<symbol>` 时，奇迹发生了：你可以在 `<use>` 标签上像使用普通图片一样设置 `width` 和 `height`，SVG 引擎会自动根据 `symbol` 内部的 `viewBox` 把图形完美地等比缩放进去！
-
-```xml
-<!-- 渲染为 16x16 大小 -->
-<use href="#icon-github" x="10" y="10" width="16" height="16" />
-
-<!-- 渲染为 48x48 大小 -->
-<use href="#icon-github" x="50" y="50" width="48" height="48" />
-```
+<SymbolVsUseVisualizer />
 
 ## 现代前端中的 SVG Sprite
 

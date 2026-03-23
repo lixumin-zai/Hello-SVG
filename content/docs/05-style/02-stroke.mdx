@@ -6,6 +6,7 @@ icon: 'Pen'
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { StrokePlayground } from '@/components/docs/05-style/stroke/StrokePlayground';
+import { StrokeAttributesVisualizer } from '@/components/docs/05-style/stroke/StrokeAttributesVisualizer';
 
 除了内部填充（Fill），给图形勾勒轮廓的**描边（Stroke）**属性在 SVG 中有着极高的地位。通过控制描边，我们可以画出各种风格的图标，甚至制作出惊艳的路径动画。
 
@@ -19,17 +20,9 @@ import { StrokePlayground } from '@/components/docs/05-style/stroke/StrokePlaygr
 
 ## 核心属性解析
 
-### 1. 线端形状 (`stroke-linecap`)
-决定了开放路径（如 `<line>` 或未闭合的 `<path>`）端点的样式：
-- `butt`（默认）：切平。线的边界正好停在端点坐标上。
-- `round`：圆角。在端点处加上一个半径为线宽一半的半圆。**这是现代 UI 图标最常用的设置！**
-- `square`：方角。在端点处加上一个长为线宽一半的矩形。（注意它会让线看起来比实际坐标长）。
+线端形状（`stroke-linecap`）和转角形状（`stroke-linejoin`）是决定图标或图形描边风格的关键属性。下面通过视觉示例来理解它们的差异：
 
-### 2. 转角形状 (`stroke-linejoin`)
-决定了两条线相交时，拐角的样式：
-- `miter`（默认）：尖角。外侧边缘直接延伸相交。
-- `round`：圆角。拐角处用平滑的圆弧连接。
-- `bevel`：斜角。直接切平拐角。
+<StrokeAttributesVisualizer />
 
 <Callout type="warn" title="Miterlimit (斜接限制) 的作用">
   当你使用 <code>miter</code> (尖角) 并且两条线夹角非常锐利时，那个尖角可能会伸出非常远，看起来像一根长长的刺。

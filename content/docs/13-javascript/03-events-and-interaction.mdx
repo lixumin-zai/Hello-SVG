@@ -6,6 +6,7 @@ icon: 'MousePointerClick'
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { EventPlayground } from '@/components/docs/13-javascript/events/EventPlayground';
+import { EventDelegationVisualizer } from '@/components/docs/13-javascript/events/EventDelegationVisualizer';
 
 在 HTML 中，元素是一个个矩形盒子，鼠标只要进入盒子的矩形区域，就会触发交互。
 但在 SVG 中，元素是各种不规则的几何图形。你画了一个空心圆（只有描边，没有填充），当你把鼠标放在圆心（空心区域）时，算不算“悬停在这个圆上”？
@@ -24,16 +25,11 @@ import { EventPlayground } from '@/components/docs/13-javascript/events/EventPla
 
 `pointer-events` 最初是 SVG 专属属性（后来才被引入 CSS 中用于 HTML）。在 SVG 中，它的可选值远比在 HTML 中丰富：
 
-*   **`visiblePainted` (默认值)**：
-    元素必须可见（`visibility` 不是 hidden）。鼠标必须落在元素的 **填充区(fill)** 或 **描边区(stroke)** 才会触发。如果 `fill="none"`，点击圆心是**不会**触发事件的！
-*   **`visibleFill`**：
-    只要鼠标在填充区内就触发，不管你设没设置 `fill`（即使是 `fill="none"` 也触发！）。
-*   **`visibleStroke`**：
-    只要鼠标在描边区上就触发，不管你设没设置 `stroke`（即使是 `stroke="none"` 也触发！）。
-*   **`all`**：
-    不管元素是否可见（哪怕 `visibility="hidden"`），也不管有没有填充和描边，只要鼠标落在它的几何范围内就触发。这经常用来做**不可见的“点击热区” (Hitbox)**。
-*   **`none`**：
-    元素彻底变成“幽灵”，鼠标会穿透它，点击到底层的元素上。
+*   **`visiblePainted` (默认值)**：元素必须可见（`visibility` 不是 hidden）。鼠标必须落在元素的 **填充区(fill)** 或 **描边区(stroke)** 才会触发。如果 `fill="none"`，点击圆心是**不会**触发事件的！
+*   **`visibleFill`**：只要鼠标在填充区内就触发，不管你设没设置 `fill`（即使是 `fill="none"` 也触发！）。
+*   **`visibleStroke`**：只要鼠标在描边区上就触发，不管你设没设置 `stroke`（即使是 `stroke="none"` 也触发！）。
+*   **`all`**：不管元素是否可见（哪怕 `visibility="hidden"`），也不管有没有填充和描边，只要鼠标落在它的几何范围内就触发。这经常用来做**不可见的“点击热区” (Hitbox)**。
+*   **`none`**：元素彻底变成“幽灵”，鼠标会穿透它，点击到底层的元素上。
 
 <Callout type="tip" title="实战技巧：隐形的热区">
   在做交互式图表时，如果数据点（小圆圈）太小，用户很难用鼠标精准点中。最佳做法是：在小圆点外面再画一个很大的透明圆（`fill="transparent" pointer-events="all"`），把事件绑定在这个大圆上！
@@ -41,40 +37,12 @@ import { EventPlayground } from '@/components/docs/13-javascript/events/EventPla
 
 ---
 
-## SVG 事件冒泡机制
+## 事件冒泡与事件委托 (Event Delegation)
 
 SVG 的事件流（捕获和冒泡）与普通的 HTML DOM 完全一致。
-
-如果你的结构是：
-```xml
-<svg>
-  <g id="group">
-    <circle id="my-circle" />
-  </g>
-</svg>
-```
-
-当用户点击 `<circle>` 时，点击事件会：
-1. 触发 `circle` 上的 click 事件。
-2. 冒泡到 `<g>`，触发 `g` 上的 click 事件。
-3. 冒泡到 `<svg>`，触发 `svg` 上的 click 事件。
-
-### 事件委托 (Event Delegation)
-
 正因为冒泡机制的存在，当我们有一个包含 1000 个多边形的中国地图时，**千万不要给每个多边形绑定事件！**
-正确的做法是把事件绑定在父级 `<svg>` 或 `<g>` 上，然后通过 `event.target` 判断用户点击的是哪个省份：
 
-```javascript
-const mapGroup = document.querySelector('#china-map');
+正确的做法是利用**事件委托**：把唯一的事件监听器绑定在父级 `<svg>` 或 `<g>` 上，然后通过 `event.target` 判断用户点击的是哪个具体的子元素。
 
-mapGroup.addEventListener('click', (e) => {
-  // 检查被点击的是不是代表省份的 path
-  if (e.target.tagName === 'path') {
-    const provinceName = e.target.getAttribute('data-name');
-    console.log(`你点击了：${provinceName}`);
-    
-    // 给点击的省份高亮
-    e.target.style.fill = 'red';
-  }
-});
-```
+<EventDelegationVisualizer />
+

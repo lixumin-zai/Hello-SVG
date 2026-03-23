@@ -6,6 +6,8 @@ icon: 'Ruler'
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { PathLengthVisualizer } from '@/components/docs/13-javascript/geometry/PathLengthVisualizer';
+import { BBoxVisualizer } from '@/components/docs/13-javascript/geometry/BBoxVisualizer';
+import { ScreenCTMVisualizer } from '@/components/docs/13-javascript/geometry/ScreenCTMVisualizer';
 
 在 Web 开发中，如果我们想知道一个 HTML `<div>` 的宽高，我们可以使用 `getBoundingClientRect()`。
 对于 SVG 元素，浏览器不仅提供了类似的包围盒计算，还提供了一套极其强大的**几何计算 API**，尤其是针对复杂曲线 `<path>` 的计算接口。
@@ -13,8 +15,8 @@ import { PathLengthVisualizer } from '@/components/docs/13-javascript/geometry/P
 ## 交互探索：路径长度与坐标定位
 
 如果你有一条复杂的贝塞尔曲线，你想让一个物体（比如小汽车）沿着这条曲线精确地开过去，或者你想做一条逐渐被画出来的线，你需要知道什么？
-1. 这条线**到底有多长**？
-2. 在进度为 50% 时，它的 **X, Y 坐标**在哪里？
+1. 这条线**到底有多长**？（通过 `getTotalLength()`）
+2. 在进度为 50% 时，它的 **X, Y 坐标**在哪里？（通过 `getPointAtLength()`）
 
 纯数学计算非常困难，但原生 SVG API 一行代码就能解决！请动手拖动下方的滑块体验：
 
@@ -22,78 +24,28 @@ import { PathLengthVisualizer } from '@/components/docs/13-javascript/geometry/P
 
 ---
 
-## 核心几何 API 详解
+## 紧凑包围盒 (BBox)
 
-### 1. `getTotalLength()`
-返回 `<path>` 路径的总长度（单位为用户坐标系像素）。
-这在实现“画线动画”（利用 `stroke-dasharray` 和 `stroke-dashoffset`）时极其重要，因为你需要用这个总长度来设定虚线的长度。
+通过 `getBBox()` 可以获取 SVG 元素的“紧凑包围盒”（Bounding Box）。它返回的对象包含 `x`, `y`, `width`, `height`。
 
-```javascript
-const path = document.querySelector('path');
-const length = path.getTotalLength();
-console.log(`这条路径的物理长度是：${length}px`);
-```
-
-### 2. `getPointAtLength(distance)`
-传入一个距离（从路径起点开始算起的长度），返回一个 `SVGPoint` 对象（包含 `x` 和 `y` 属性），表示路径在该距离处的精确坐标。
-
-```javascript
-const path = document.querySelector('path');
-// 获取距离起点 100px 处的坐标
-const point = path.getPointAtLength(100);
-console.log(`x: ${point.x}, y: ${point.y}`);
-```
-
-### 3. `getBBox()`
-返回 SVG 元素的“紧凑包围盒”（Bounding Box）。它返回的对象包含 `x`, `y`, `width`, `height`。
 这与 HTML 的 `getBoundingClientRect()` 不同：
-- `getBBox()` 返回的是元素在其**本地用户坐标系**中的尺寸，不受 CSS `transform` 或 SVG `transform` 缩放/旋转的影响。
-- 它只计算图形的几何边界，**不包含描边 (stroke)** 的宽度！
+- `getBBox()` 返回的是元素在其**本地用户坐标系**中的尺寸，不受 CSS `transform` 缩放/旋转的影响。
+- **它只计算图形的几何边界，不包含描边 (stroke) 的宽度！**
 
-```javascript
-const circle = document.querySelector('circle');
-const bbox = circle.getBBox();
-console.log(`图形占据的宽度: ${bbox.width}, 高度: ${bbox.height}`);
-```
+<BBoxVisualizer />
 
 ---
 
-## 13.3 坐标转换实战
+## 13.3 坐标转换实战 (Screen CTM)
 
-在处理 SVG 交互（例如拖拽、自定义绘图板）时，我们经常需要把屏幕坐标（鼠标事件的 `clientX` / `clientY`）转换为 SVG 内部的用户坐标系。
-
-因为 SVG 画布可能被缩放了（通过 `viewBox`）、甚至可能被 CSS 变形了（`transform`），所以两者的坐标往往不是 1:1 的。
+在处理 SVG 交互（例如拖拽、自定义绘图板）时，我们经常需要把屏幕坐标（鼠标事件的 `clientX` / `clientY`）转换为 SVG 内部的用户坐标系。因为 SVG 画布可能被缩放了（通过 `viewBox`），甚至可能被 CSS 变形了，所以两者的坐标往往不是 1:1 的。
 
 ### 使用 `getScreenCTM()` 转换坐标
 
-现代浏览器的终极解法是利用 CTM（坐标变换矩阵）。以下是标准套路代码：
+现代浏览器的终极解法是利用 CTM（坐标变换矩阵）。在下方的区域中移动鼠标，观察屏幕 DOM 坐标是如何被转换成 SVG 内部绝对坐标的：
 
-```javascript
-const svg = document.querySelector('svg');
-
-function getMousePosition(event) {
-  // 1. 创建一个临时的 SVG 坐标点
-  let point = svg.createSVGPoint();
-  
-  // 2. 把鼠标屏幕坐标赋给它
-  point.x = event.clientX;
-  point.y = event.clientY;
-  
-  // 3. 获取 SVG 画布相对于屏幕的变换矩阵，并求其逆矩阵
-  let ctm = svg.getScreenCTM().inverse();
-  
-  // 4. 将屏幕点乘上逆矩阵，得到真实的 SVG 内部坐标！
-  let svgPoint = point.matrixTransform(ctm);
-  
-  return svgPoint;
-}
-
-svg.addEventListener('mousemove', (e) => {
-  const pos = getMousePosition(e);
-  console.log('SVG 内部坐标：', pos.x, pos.y);
-});
-```
+<ScreenCTMVisualizer />
 
 <Callout type="tip" title="为什么要用这个公式？">
-  无论你的 SVG 页面如何滚动、无论设置了什么奇葩的 `viewBox`，无论外部被 CSS 怎样缩放，这套代码都能保证你获取到鼠标在 SVG 世界中的绝对精确位置！
+  无论你的 SVG 页面如何滚动、无论设置了什么奇葩的 `viewBox`，无论外部被 CSS 怎样缩放，利用 `svg.getScreenCTM().inverse()` 这套计算矩阵都能保证你获取到鼠标在 SVG 世界中的绝对精确位置！
 </Callout>

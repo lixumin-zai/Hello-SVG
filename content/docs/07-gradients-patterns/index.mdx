@@ -6,6 +6,7 @@ icon: 'Palette'
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { GradientPlayground } from '@/components/docs/07-gradients-patterns/gradients/GradientPlayground';
+import { GradientConceptsExplorer } from '@/components/docs/07-gradients-patterns/gradients/GradientConceptsExplorer';
 
 渐变是让扁平的 2D 图形产生 3D 光影错觉最有效的方法。SVG 提供了两种基础渐变：**线性渐变 (`<linearGradient>`)** 和 **径向渐变 (`<radialGradient>`)**。
 
@@ -21,29 +22,9 @@ import { GradientPlayground } from '@/components/docs/07-gradients-patterns/grad
 
 ## 核心概念
 
-### 1. 线性渐变的方向向量
-在线性渐变中，我们通过 `(x1, y1)` 和 `(x2, y2)` 来定义一条直线（方向向量）。渐变颜色将沿着这条线均匀过渡。
-*   默认值是 `x1="0%", y1="0%", x2="100%", y2="0%"`，即**从左到右的水平渐变**。
-*   如果改为 `x2="0%", y2="100%"`，就会变成**从上到下的垂直渐变**。
-*   如果改为 `x2="100%", y2="100%"`，就会变成**对角线渐变**。
+通过下方组件，快速了解渐变方向、焦点以及颜色节点的设置规则。
 
-### 2. 径向渐变的神奇焦点 (fx, fy)
-径向渐变是从中心向外呈圆形（或椭圆形）扩散的渐变。
-*   `cx, cy, r`：定义了渐变的最外层边界（即 100% 颜色所在的位置）。
-*   **`fx, fy` (Focus 焦点)**：这是径向渐变最强大的属性。它定义了 0% 颜色开始的位置。如果焦点偏离了中心点，你就可以轻松画出一个**带有立体高光的球体**（见上方演示器的径向渐变选项卡，尝试拖动 `fx, fy` 滑块）。
-
-### 3. `<stop>` 颜色节点
-无论哪种渐变，内部都需要嵌套 `<stop>` 元素来定义颜色节点。
-```xml
-<linearGradient id="myGrad">
-  <stop offset="0%" stop-color="blue" />
-  <stop offset="50%" stop-color="green" stop-opacity="0.5" />
-  <stop offset="100%" stop-color="red" />
-</linearGradient>
-```
-*   `offset`：颜色出现的位置（可以用百分比或 0-1 的小数）。
-*   `stop-color`：颜色值。
-*   `stop-opacity`：该节点的透明度（支持渐隐效果）。
+<GradientConceptsExplorer />
 
 <Callout type="tip" title="渐变的坐标系 (gradientUnits)">
   默认情况下，渐变的坐标（如 100%）是相对于**应用它的那个图形（Bounding Box）**来计算的。这意味着同一个渐变应用在不同大小的矩形上，会自动拉伸适应。

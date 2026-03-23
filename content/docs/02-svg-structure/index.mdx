@@ -6,6 +6,7 @@ icon: 'FileCode'
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { ViewBoxPlayground } from '@/components/docs/02-svg-structure/index/ViewBoxPlayground';
+import { CoordinateSystem } from '@/components/docs/02-svg-structure/index/CoordinateSystem';
 
 一个 SVG 文件本质上就是一个 XML 文档。了解它的基本结构和坐标系统，是掌握 SVG 的第一步。
 
@@ -57,10 +58,6 @@ import { ViewBoxPlayground } from '@/components/docs/02-svg-structure/index/View
 
 ## 坐标系统原点与方向
 
-最后，记住 SVG 坐标系的默认规则（这与 Canvas 和大多数屏幕渲染系统一致，但与我们在数学课上学的笛卡尔坐标系不同）：
+最后，记住 SVG 坐标系的默认规则（这与 Canvas 和大多数屏幕渲染系统一致，但与我们在数学课上学的笛卡尔坐标系不同）。请通过下面的交互组件直观感受：
 
-*   **原点 (0,0)** 位于左上角。
-*   **X 轴** 正方向向**右**。
-*   **Y 轴** 正方向向**下**（数学系是向上）。
-
-这也意味着，如果你想让一个元素在 SVG 中“下落”，你需要**增加**它的 Y 坐标值。
+<CoordinateSystem />

@@ -6,6 +6,7 @@ icon: 'Wand'
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { ColorMorphPlayground } from '@/components/docs/08-filters/color-morph/ColorMorphPlayground';
+import { FilterPrimitivesExplorer } from '@/components/docs/08-filters/color-morph/FilterPrimitivesExplorer';
 
 模糊只是滤镜的冰山一角。SVG 提供了一系列更高级的原语，允许我们在像素级别对图形进行颜色替换、结构腐蚀甚至物理扭曲。
 
@@ -19,24 +20,9 @@ import { ColorMorphPlayground } from '@/components/docs/08-filters/color-morph/C
 
 ## 核心原语解析
 
-### 1. 颜色矩阵 `<feColorMatrix>`
-这类似于 Photoshop 中的“色彩平衡”或“色相/饱和度”调整层。它通过矩阵乘法重新计算每个像素的 RGBA 值。
-*   `type="hueRotate"`：旋转色相环。可以一键把蓝天变成紫天，或者把红色按钮变成绿色按钮。
-*   `type="saturate"`：调整饱和度。值为 `0` 时，图像变成完美的黑白灰度图。
-*   `type="luminanceToAlpha"`：把图像的“亮度”转换成“透明度”。图像越白的地方越不透明，越黑的地方越透明。这在制作自定义蒙版时非常有用。
+以下是三种最常用的高级滤镜原语。通过它们，你可以实现几乎所有的复杂视觉效果。
 
-### 2. 形态学滤镜 `<feMorphology>`
-用于让图形的轮廓“变胖”或“变瘦”。
-*   `operator="dilate"`（膨胀）：让图形向外扩张，常用于给没有描边属性的复杂图形（或文字）加粗。
-*   `operator="erode"`（腐蚀）：让图形向内收缩，如果 `radius` 足够大，图形会完全消失。
-
-### 3. 终极魔法：置换贴图 `<feDisplacementMap>`
-这是创造水波纹、火焰扭曲、故障艺术（Glitch Art）的核心技术。它的工作原理需要两个输入：
-1. **源图像 (SourceGraphic)**：你想要扭曲的那个图形或文字。
-2. **位移图 (Displacement Map)**：一张作为“参考指南”的图片。
-
-**扭曲规则**：
-它会去读取“位移图”上每个像素的颜色。如果该像素偏红（R通道），就把源图像对应位置的像素向右推；如果偏绿（G通道），就向下推。推的距离由 `scale` 属性决定。
+<FilterPrimitivesExplorer />
 
 <Callout type="tip" title="柏林噪声 (Perlin Noise)">
   那么去哪里找一张合适的“位移图”呢？

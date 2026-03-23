@@ -5,6 +5,8 @@ icon: 'Zap'
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
+import { SmilBasicsVisualizer } from '@/components/docs/12-animations/smil/SmilBasicsVisualizer';
+import { SmilMotionVisualizer } from '@/components/docs/12-animations/smil/SmilMotionVisualizer';
 
 ## 什么是 SMIL？
 
@@ -17,51 +19,16 @@ SMIL（Synchronized Multimedia Integration Language）是 SVG 内置的动画标
 
 ## 核心元素介绍
 
-### 1. `<animate>`：属性渐变
-用于在两个属性值之间渐变（例如 `fill` 颜色、`r` 半径）。
+### 1. 属性与变换动画 (`<animate>` & `<animateTransform>`)
 
-```xml
-<circle cx="50" cy="50" r="15" fill="blue">
-  <!-- 改变颜色 -->
-  <animate 
-    attributeName="fill" 
-    values="blue; red; blue" 
-    dur="2s" 
-    repeatCount="indefinite" 
-  />
-</circle>
-```
+- **`<animate>`**：用于在两个或多个属性值之间渐变（例如 `fill` 颜色、`r` 半径等）。
+- **`<animateTransform>`**：专门用于控制元素的旋转、平移、缩放等变换操作。
 
-### 2. `<animateTransform>`：变换动画
-专门用于旋转、平移、缩放等变换。
+<SmilBasicsVisualizer />
 
-```xml
-<rect x="25" y="25" width="50" height="50">
-  <!-- 围绕中心点 (50, 50) 旋转 -->
-  <animateTransform 
-    attributeName="transform" 
-    type="rotate" 
-    from="0 50 50" 
-    to="360 50 50" 
-    dur="3s" 
-    repeatCount="indefinite" 
-  />
-</rect>
-```
+### 2. 杀手级功能：路径运动 (`<animateMotion>`)
 
-### 3. `<animateMotion>`：杀手级功能！
-让元素沿着任意 `<path>` 路径运动，这是纯 CSS 很难做到的。
+让元素沿着任意 `<path>` 路径运动，这是纯 CSS 很难做到的。通过 `<mpath>`，动画元素可以完美地沿着定义好的轨迹路径循环运动，甚至可以根据路径方向自动旋转！
 
-```xml
-<svg viewBox="0 0 200 200">
-  <!-- 运动轨迹 -->
-  <path id="track" d="M 10 100 Q 100 10 190 100 T 190 190" fill="none" stroke="gray" />
-  
-  <circle r="10" fill="red">
-    <animateMotion dur="4s" repeatCount="indefinite">
-      <mpath href="#track" />
-    </animateMotion>
-  </circle>
-</svg>
-```
-通过 `<mpath>`，动画元素可以完美地沿着定义好的轨迹路径循环运动。
+<SmilMotionVisualizer />
+

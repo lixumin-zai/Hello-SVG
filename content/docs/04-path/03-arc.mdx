@@ -7,6 +7,7 @@ icon: 'Target'
 import { Callout } from 'fumadocs-ui/components/callout';
 import { ArcPlayground } from '@/components/docs/04-path/arc/ArcPlayground';
 import { FillRulePlayground } from '@/components/docs/04-path/arc/FillRulePlayground';
+import { FillRuleExplorer } from '@/components/docs/04-path/arc/FillRuleExplorer';
 
 这是本章最硬核的部分。掌握了弧线（Arc）和填充规则（Fill Rule），你就能用 SVG 绘制出饼图、环形图、以及带有复杂镂空的图标。
 
@@ -50,11 +51,8 @@ import { FillRulePlayground } from '@/components/docs/04-path/arc/FillRulePlaygr
 
 <FillRulePlayground />
 
-### 两种规则的区别
-1. **`nonzero`（非零环绕规则，默认）**：
-   想象从图形内部射出一条射线。穿过一条从左向右画的线计数 +1，穿过从右向左画的线计数 -1。如果最后总和不是 0，就在内部（填充）。
-   *这意味着，如果你想画一个镂空的甜甜圈，外圈必须顺时针画，内圈必须逆时针画！*
+### 规则原理解析
 
-2. **`evenodd`（奇偶规则）**：
-   不关心画线的方向！只要射线穿过路径的次数是奇数次，就在内部（填充）；如果是偶数次，就在外部（不填充）。
-   *对于制作复杂镂空图标，使用 `evenodd` 通常更简单，不用管设计软件是怎么画这些线的。*
+下面我们通过“射线测试法”图解，直观理解两种规则的区别。
+
+<FillRuleExplorer />
