@@ -1,20 +1,29 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { Grid2X2, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
+import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
+import { ZoomIn, ZoomOut } from 'lucide-react';
 import { toReactStyle, toReactNative, toDataUri } from '@/lib/svg-utils';
+
+/** Same set as used in Editor — must stay in sync */
+const SVG_ELEMENT_TAGS = new Set([
+    'svg', 'rect', 'circle', 'ellipse', 'line', 'polyline', 'polygon',
+    'path', 'text', 'tspan', 'g', 'use', 'image', 'foreignobject',
+    'clippath', 'mask', 'pattern', 'marker', 'symbol',
+]);
 
 interface ViewerProps {
     svgCode: string;
+    hoveredTagIndex?: number | null;
 }
 
 type TabMode = 'preview' | 'react' | 'reactNative' | 'dataUri';
 type BgMode = 'checkerboard' | 'white' | 'black';
 
-export function Viewer({ svgCode }: ViewerProps) {
+export function Viewer({ svgCode, hoveredTagIndex }: ViewerProps) {
     const [activeTab, setActiveTab] = useState<TabMode>('preview');
     const [bgMode, setBgMode] = useState<BgMode>('checkerboard');
     const [zoom, setZoom] = useState(100);
+    const svgContainerRef = useRef<HTMLDivElement>(null);
 
     const processedContent = useMemo(() => {
         if (!svgCode || (!svgCode.includes('<svg') && !svgCode.includes('<SVG'))) {
@@ -42,6 +51,39 @@ export function Viewer({ svgCode }: ViewerProps) {
             return { type: 'error', content: 'Error processing SVG' };
         }
     }, [svgCode, activeTab]);
+
+    // Highlight the hovered element in the rendered SVG
+    const applyHighlight = useCallback(() => {
+        const container = svgContainerRef.current;
+        if (!container) return;
+
+        // Collect all SVG element children in document order
+        const allElements = container.querySelectorAll('*');
+        const svgElements: Element[] = [];
+        allElements.forEach((el) => {
+            if (SVG_ELEMENT_TAGS.has(el.tagName.toLowerCase())) {
+                svgElements.push(el);
+            }
+        });
+
+        // Remove previous highlights
+        svgElements.forEach((el) => {
+            (el as HTMLElement | SVGElement).classList.remove('svg-hover-highlight');
+        });
+
+        // Apply highlight to the target element
+        if (hoveredTagIndex != null && hoveredTagIndex < svgElements.length) {
+            const target = svgElements[hoveredTagIndex] as HTMLElement | SVGElement;
+            target.classList.add('svg-hover-highlight');
+        }
+    }, [hoveredTagIndex]);
+
+    useEffect(() => {
+        if (activeTab === 'preview') {
+            // Small delay to ensure DOM has been updated by dangerouslySetInnerHTML
+            requestAnimationFrame(applyHighlight);
+        }
+    }, [hoveredTagIndex, processedContent, activeTab, applyHighlight]);
 
     const handleZoomIn = () => setZoom(prev => Math.min(prev + 25, 500));
     const handleZoomOut = () => setZoom(prev => Math.max(prev - 25, 25));
@@ -83,6 +125,16 @@ export function Viewer({ svgCode }: ViewerProps) {
 
     return (
         <div className="flex flex-col flex-1 h-full w-full relative group/viewer">
+            {/* Injected highlight styles */}
+            <style>{`
+                .svg-hover-highlight {
+                    outline: 2px dashed rgba(99, 102, 241, 0.8) !important;
+                    outline-offset: 2px;
+                    filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.5));
+                    transition: outline 0.15s ease, filter 0.15s ease;
+                }
+            `}</style>
+
             {/* Top Tabs */}
             <div className="flex items-center gap-1 px-3 py-2 border-b border-zinc-200/50 dark:border-zinc-800/50 bg-white/40 dark:bg-zinc-900/40 backdrop-blur-sm overflow-x-auto custom-scrollbar">
                 {tabs.map((tab) => (
@@ -119,6 +171,7 @@ export function Viewer({ svgCode }: ViewerProps) {
                             className="transition-all duration-200 ease-out flex items-center justify-center"
                         >
                             <div
+                                ref={svgContainerRef}
                                 className="filter drop-shadow-md bg-transparent [&>svg]:w-full [&>svg]:h-auto [&>svg]:max-w-[none] [&>svg]:max-h-[none]"
                                 dangerouslySetInnerHTML={{ __html: processedContent.content }}
                             />

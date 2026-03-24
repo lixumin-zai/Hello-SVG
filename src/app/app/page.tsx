@@ -22,6 +22,7 @@ const DEFAULT_SVG = `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/sv
 
 export default function SvgEditorPage() {
     const [svgCode, setSvgCode] = useState(DEFAULT_SVG);
+    const [hoveredTagIndex, setHoveredTagIndex] = useState<number | null>(null);
 
     return (
         <div className="flex flex-col min-h-screen w-full relative bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 selection:bg-indigo-500/30 font-sans transition-colors duration-500">
@@ -53,12 +54,12 @@ export default function SvgEditorPage() {
                     <div className="flex flex-col rounded-2xl bg-white/70 dark:bg-zinc-900/60 backdrop-blur-xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm overflow-hidden transition-colors duration-500 group relative">
                         {/* Decorative glow inside card */}
                         <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none group-hover:bg-indigo-500/10 transition-colors duration-700" />
-                        <Editor value={svgCode} onChange={setSvgCode} />
+                        <Editor value={svgCode} onChange={setSvgCode} hoveredTagIndex={hoveredTagIndex} onHoverTag={setHoveredTagIndex} />
                     </div>
 
                     {/* Viewer Card */}
                     <div className="flex flex-col rounded-2xl bg-white/70 dark:bg-zinc-900/60 backdrop-blur-xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm overflow-hidden transition-colors duration-500">
-                        <Viewer svgCode={svgCode} />
+                        <Viewer svgCode={svgCode} hoveredTagIndex={hoveredTagIndex} />
                     </div>
                 </div>
             </main>
