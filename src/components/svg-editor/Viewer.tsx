@@ -14,12 +14,13 @@ const SVG_ELEMENT_TAGS = new Set([
 interface ViewerProps {
     svgCode: string;
     hoveredTagIndex?: number | null;
+    onHoverTag?: (index: number | null) => void;
 }
 
 type TabMode = 'preview' | 'react' | 'reactNative' | 'dataUri';
 type BgMode = 'checkerboard' | 'white' | 'black';
 
-export function Viewer({ svgCode, hoveredTagIndex }: ViewerProps) {
+export function Viewer({ svgCode, hoveredTagIndex, onHoverTag }: ViewerProps) {
     const [activeTab, setActiveTab] = useState<TabMode>('preview');
     const [bgMode, setBgMode] = useState<BgMode>('checkerboard');
     const [zoom, setZoom] = useState(100);
@@ -52,12 +53,10 @@ export function Viewer({ svgCode, hoveredTagIndex }: ViewerProps) {
         }
     }, [svgCode, activeTab]);
 
-    // Highlight the hovered element in the rendered SVG
-    const applyHighlight = useCallback(() => {
+    // Collect SVG elements helper
+    const getSvgElements = useCallback(() => {
         const container = svgContainerRef.current;
-        if (!container) return;
-
-        // Collect all SVG element children in document order
+        if (!container) return [];
         const allElements = container.querySelectorAll('*');
         const svgElements: Element[] = [];
         allElements.forEach((el) => {
@@ -65,6 +64,12 @@ export function Viewer({ svgCode, hoveredTagIndex }: ViewerProps) {
                 svgElements.push(el);
             }
         });
+        return svgElements;
+    }, []);
+
+    // Highlight the hovered element in the rendered SVG
+    const applyHighlight = useCallback(() => {
+        const svgElements = getSvgElements();
 
         // Remove previous highlights
         svgElements.forEach((el) => {
@@ -76,14 +81,51 @@ export function Viewer({ svgCode, hoveredTagIndex }: ViewerProps) {
             const target = svgElements[hoveredTagIndex] as HTMLElement | SVGElement;
             target.classList.add('svg-hover-highlight');
         }
-    }, [hoveredTagIndex]);
+    }, [hoveredTagIndex, getSvgElements]);
 
     useEffect(() => {
         if (activeTab === 'preview') {
-            // Small delay to ensure DOM has been updated by dangerouslySetInnerHTML
             requestAnimationFrame(applyHighlight);
         }
     }, [hoveredTagIndex, processedContent, activeTab, applyHighlight]);
+
+    // Attach mouseover/mouseout listeners to the container for event delegation
+    useEffect(() => {
+        const container = svgContainerRef.current;
+        if (!container || activeTab !== 'preview' || !onHoverTag) return;
+
+        const handleMouseOver = (e: MouseEvent) => {
+            const target = e.target as Element;
+            if (target && target.tagName && SVG_ELEMENT_TAGS.has(target.tagName.toLowerCase())) {
+                const svgElements = getSvgElements();
+                const index = svgElements.indexOf(target);
+                if (index !== -1) {
+                    onHoverTag(index);
+                }
+            }
+        };
+
+        const handleMouseOut = (e: MouseEvent) => {
+            const related = e.relatedTarget as Element | null;
+            // If the mouse is moving to another element INSIDE the container, do nothing.
+            // The subsequent mouseover will handle highlighting the new element.
+            if (container.contains(related)) {
+                return;
+            }
+            // Otherwise, the mouse just left the container entirely
+            onHoverTag(null);
+        };
+
+        container.addEventListener('mouseover', handleMouseOver);
+        container.addEventListener('mouseout', handleMouseOut);
+
+        return () => {
+            container.removeEventListener('mouseover', handleMouseOver);
+            container.removeEventListener('mouseout', handleMouseOut);
+        };
+    }, [activeTab, onHoverTag, getSvgElements]);
+
+    const cleanupRef = useRef<(() => void) | null>(null);
 
     const handleZoomIn = () => setZoom(prev => Math.min(prev + 25, 500));
     const handleZoomOut = () => setZoom(prev => Math.max(prev - 25, 25));

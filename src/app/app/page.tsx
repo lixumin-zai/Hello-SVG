@@ -59,7 +59,7 @@ export default function SvgEditorPage() {
 
                     {/* Viewer Card */}
                     <div className="flex flex-col rounded-2xl bg-white/70 dark:bg-zinc-900/60 backdrop-blur-xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm overflow-hidden transition-colors duration-500">
-                        <Viewer svgCode={svgCode} hoveredTagIndex={hoveredTagIndex} />
+                        <Viewer svgCode={svgCode} hoveredTagIndex={hoveredTagIndex} onHoverTag={setHoveredTagIndex} />
                     </div>
                 </div>
             </main>
