@@ -6,6 +6,7 @@ icon: 'Plug'
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { EmbeddingMethodsLab } from '@/components/docs/02-svg-structure/embedding/EmbeddingMethodsLab';
+import { EmbeddingComparison } from '@/components/docs/02-svg-structure/embedding/EmbeddingComparison';
 
 在网页中显示图片，通常只有 `<img>` 标签或 CSS `background-image` 两种选择。但由于 SVG 既是图像又是文档（DOM），它在网页中的嵌入方式多达 5 种以上。
 
@@ -21,40 +22,9 @@ import { EmbeddingMethodsLab } from '@/components/docs/02-svg-structure/embeddin
 
 ## 详细对比与最佳实践
 
-### 1. 内联 SVG (Inline SVG)
-**方法**：直接将 `<svg>` 标签写在 HTML 文档中（或者在 React/Vue 中作为组件渲染）。
-
-*   **优点**：最强大。SVG 完全成为 HTML DOM 树的一部分。你可以用外部 CSS（如 Tailwind 类名）轻松修改它的 `fill`、`stroke`，也可以用 JS 绑定点击事件，或者做复杂的路径动画。
-*   **缺点**：无法被浏览器作为独立文件缓存。如果一个很大的 SVG 在每个页面都出现，会导致 HTML 体积臃肿。
-*   **适用场景**：单色/多色 UI 图标（配合 `currentColor`）、需要复杂交互的数据可视化图表（D3.js）、页面专属的插画动画。
-
-### 2. `<img>` 标签
-**方法**：`<img src="image.svg" alt="..." />`
-
-*   **优点**：最简单，语义明确，支持浏览器强缓存，对无障碍访问（A11y）友好。
-*   **缺点**：出于安全和隐私原因，浏览器会创建一个“隔离”环境。主页面的 CSS 无法穿透进去修改图形的颜色；主页面的 JS 也无法操作里面的节点；SVG 内部哪怕写了 `<script>` 也不会执行。
-*   **适用场景**：不需要修改颜色、不需要内部交互的纯静态插图、Logo、照片占位符。
-
-### 3. CSS `background-image`
-**方法**：`.icon { background-image: url('image.svg'); }`
-
-*   **优点**：适合纯装饰性的图形，支持缓存。
-*   **缺点**：完全没有语义，屏幕阅读器会忽略它。同样无法用外部 CSS 修改内部颜色。
-*   **适用场景**：网页背景纹理、纯装饰性的列表小图标。
+<EmbeddingComparison />
 
 <Callout type="tip" title="CSS 遮罩黑科技 (Mask)">
   如果你既想享受外链文件的缓存优势，又想通过 CSS 动态改变单色图标的颜色，可以使用 `mask` 属性：<br/>
   `background-color: blue; mask: url('icon.svg');`
 </Callout>
-
-### 4. `<object>` 与 `<iframe>` 标签
-**方法**：`<object type="image/svg+xml" data="image.svg"></object>`
-
-*   **优点**：支持缓存。同时，如果是同源请求，主页面的 JS 可以通过 `document.querySelector('object').contentDocument` 获取到 SVG 内部的 DOM 并进行操作。
-*   **缺点**：语法相对古老，处理跨域（CORS）问题比较麻烦。
-*   **适用场景**：体积巨大的交互式地图（需要独立缓存，又需要复杂的点击高亮交互）。
-
-### 5. Data URI (Base64 或 URL 编码)
-**方法**：`<img src="data:image/svg+xml;utf8,<svg>...</svg>">`
-
-通过将 SVG 代码转码后直接嵌在 URL 中，常用于 CSS 中减少小图标的 HTTP 请求。由于 SVG 是文本，通常不需要 Base64 编码，只需进行简单的 URL 编码（如将 `<` 替换为 `%3C`）即可，这样体积更小且可读。

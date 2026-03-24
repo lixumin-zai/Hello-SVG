@@ -5,7 +5,9 @@ icon: 'Circle'
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Cards, Card } from 'fumadocs-ui/components/card';
 import { CirclePolygonPlayground } from '@/components/docs/03-basic-shapes/circles-polygons/CirclePolygonPlayground';
+import { PolygonVsPolyline } from '@/components/docs/03-basic-shapes/circles-polygons/PolygonVsPolyline';
 
 除了基于矩形的形状，SVG 还提供了一组基于中心点和半径的形状，以及能够绘制任意闭合几何体的多边形。
 
@@ -19,26 +21,33 @@ import { CirclePolygonPlayground } from '@/components/docs/03-basic-shapes/circl
 
 ## 核心概念速记
 
-### `<circle>` 圆形
-这是最常用的形状之一，常用于头像占位符、散点图或动画基础元素。
-- `cx`, `cy`：圆心坐标。（**C**enter X, **C**enter Y）
-- `r`：半径。（**R**adius）
+<Cards>
+  <Card title="<circle> 圆形" icon="⏺️">
+    最常用的形状之一，常用于头像占位符、散点图或动画基础元素。
+    - **`cx`, `cy`**：圆心坐标。（Center X, Center Y）
+    - **`r`**：半径。（Radius）
+  </Card>
 
-### `<ellipse>` 椭圆
-当你需要一个被“压扁”的圆时使用。
-- `cx`, `cy`：中心点坐标。
-- `rx`：水平方向（X 轴）的半径。
-- `ry`：垂直方向（Y 轴）的半径。
+  <Card title="<ellipse> 椭圆" icon="👁️">
+    当你需要一个被“压扁”的圆时使用。
+    - **`cx`, `cy`**：中心点坐标。
+    - **`rx`**：水平方向（X 轴）的半径。
+    - **`ry`**：垂直方向（Y 轴）的半径。
+  </Card>
+</Cards>
 
 <Callout type="tip" title="技巧：圆角按钮">
   虽然 <code>&lt;rect&gt;</code> 可以通过设置 <code>rx</code> 和 <code>ry</code> 来制作圆角，但有时候使用 <code>&lt;ellipse&gt;</code> 或带有圆角的 <code>&lt;polygon&gt;</code> 在某些特定的图表设计中会更加灵活。
 </Callout>
 
 ### `<polygon>` 多边形
-用于绘制至少有 3 个边的**闭合**图形（如三角形、星形、六边形网格等）。
-- `points`：和折线 `<polyline>` 完全一样的坐标列表格式。
-- **自动闭合**：即使你的 `points` 列表中最后一个点没有连回第一个点，浏览器在渲染 `<polygon>` 时也会**自动画一条线将首尾相连**。
 
-<Callout type="info" title="Polygon vs Polyline">
-  如果图形需要填充颜色（`fill`），通常使用 `<polygon>`；如果只是画一条开放的折线轨迹（比如折线图的走势线），则必须使用 `<polyline>`。
+用于绘制至少有 3 个边的**闭合**图形（如三角形、星形、六边形网格等）。它和折线 `<polyline>` 类似，使用相同的 `points` 属性格式。
+
+<PolygonVsPolyline />
+
+**自动闭合**：即使你的 `points` 列表中最后一个点没有连回第一个点，浏览器在渲染 `<polygon>` 时也会**自动画一条线将首尾相连**。
+
+<Callout type="info" title="Polygon vs Polyline 的终极抉择">
+  如果图形需要填充颜色（`fill`），强烈建议使用 `<polygon>` 以避免意想不到的边缘渲染问题；如果只是画一条开放的折线轨迹（比如折线图的走势线），则必须使用 `<polyline>`。
 </Callout>

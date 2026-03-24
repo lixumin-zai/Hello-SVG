@@ -67,7 +67,7 @@ export function BezierPlayground() {
   }, [draggingPoint]);
 
   return (
-    <div className="rounded-xl border border-border bg-card p-6 my-6">
+    <div className="rounded-xl border border-border bg-card p-6 my-6 shadow-sm hover:shadow-md transition-shadow duration-300">
       <div className="flex gap-2 mb-6 border-b pb-4">
         <button 
           onClick={() => setActiveTab('quadratic')}

@@ -7,39 +7,49 @@ icon: 'History'
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Cards, Card } from 'fumadocs-ui/components/card';
 import { HistoryTimeline } from '@/components/docs/01-svg-basics/index/HistoryTimeline';
+import { WhatIsSvg } from '@/components/docs/01-svg-basics/index/WhatIsSvg';
+import { SvgVsFlash } from '@/components/docs/01-svg-basics/index/SvgVsFlash';
 
 ## 什么是 SVG？
 
 SVG 的全称是 **Scalable Vector Graphics**（可缩放矢量图形），它是一种基于 XML 的标记语言，用于描述二维的矢量图形。
 
+<WhatIsSvg />
+
 <Callout type="info" title="矢量图形 vs. 光栅图形">
-  与 JPEG、PNG 等光栅图像不同，矢量图形不使用像素网格来保存图像，而是使用数学方程和几何基元（如点、线、曲线）来记录图形信息，因此它可以在任何分辨率下无损缩放。
+  与 JPEG、PNG 等光栅图像不同，矢量图形不使用像素网格来保存图像，而是使用数学方程和几何基元（如点、线、曲线）来记录图形信息，因此它可以在任何分辨率下无损缩放。这让它非常适合用于现代 Web 开发中的图标、插画和数据可视化。
 </Callout>
 
 ## 矢量图形的历史背景
 
-在 SVG 出现之前，矢量图形领域主要是 **PostScript** 和 **EPS** 时代。它们在打印和出版领域表现优异，但不适合互联网传输和直接渲染。
+在 SVG 出现之前，矢量图形领域主要是 **PostScript** 和 **EPS** 时代。它们在打印和出版领域表现优异，但不适合互联网传输和直接在浏览器中渲染。
 
 随着 Web 的发展，各大厂商都尝试推出自己的 Web 矢量图形标准：
-- **VML (Vector Markup Language)**：微软和 Visio 等公司提交给 W3C。
-- **PGML (Precision Graphics Markup Language)**：Adobe 和 IBM 等公司提交给 W3C，基于 PDF 模型。
+- **VML (Vector Markup Language)**：由微软和 Visio 等公司提交给 W3C。
+- **PGML (Precision Graphics Markup Language)**：由 Adobe 和 IBM 等公司提交给 W3C，基于 PDF 模型。
 
 ## SVG 的诞生与标准化历程
 
-为了避免标准分裂，W3C 成立了专门的工作组，吸收了 VML 和 PGML 两者的优点，于 1999 年起草了全新的 SVG 标准。
+为了避免标准分裂，W3C 成立了专门的工作组，吸收了 VML 和 PGML 两者的优点，于 1999 年起草了全新的 SVG 标准。通过标准的统一，Web 开发者拥有了一套通用的、跨平台的图形描述语言。
 
 <HistoryTimeline />
 
 ## 浏览器支持历史与现状
 
 <Callout type="warn" title="IE6 时代的噩梦">
-  早期的浏览器（尤其是 IE6）原生不支持 SVG。开发者必须借助第三方插件（最著名的是 **Adobe SVG Viewer**）才能在网页上显示 SVG 图形。这严重阻碍了 SVG 的普及。
+  早期的浏览器（尤其是 IE6）原生不支持 SVG。开发者必须借助第三方插件（最著名的是 **Adobe SVG Viewer**）才能在网页上显示 SVG 图形。这严重阻碍了 SVG 的普及，也让开发者在处理跨浏览器兼容性时苦不堪言。
 </Callout>
 
-直到 **IE9** 终于原生支持了大部分 SVG 1.1 的特性，以及现代浏览器（Chrome、Firefox、Safari）的快速迭代，SVG 才迎来了真正的爆发。今天，所有主流浏览器都完美支持 SVG。
+直到 **IE9** 终于原生支持了大部分 SVG 1.1 的特性，以及现代浏览器（Chrome、Firefox、Safari）的快速迭代，SVG 才迎来了真正的爆发。今天，所有主流浏览器都完美支持 SVG 的全部核心功能，无论是桌面端还是移动端，SVG 已经成为 Web 开发不可或缺的一部分。
 
 ## SVG vs. Flash：一场时代之战
 
-在 SVG 缓慢普及的年代，Adobe 的 **Flash** 统治了 Web 交互与矢量动画领域。但 Flash 存在闭源、性能差、耗电量大（尤其在移动端）、安全性差等问题。
+在 SVG 缓慢普及的年代，Adobe 的 **Flash** 统治了 Web 交互与矢量动画领域。但 Flash 存在闭源、性能差、耗电量大（尤其在移动端）、安全性差等致命缺陷。
 
 随着 HTML5 的兴起、Steve Jobs 的著名公开信《Thoughts on Flash》以及移动互联网时代的到来，开放、标准化的 SVG 结合 CSS3 和 HTML5，最终成为了这场时代之战的赢家。Flash 也在 2020 年被彻底终结。
+
+<SvgVsFlash />
+
+<Cards>
+  <Card title="继续阅读：SVG 的本质" href="/docs/01-svg-basics/02-essence" description="深入了解 SVG 作为 XML 文本文件的独特优势。" />
+</Cards>

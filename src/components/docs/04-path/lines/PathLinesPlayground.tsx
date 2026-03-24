@@ -49,7 +49,7 @@ export function PathLinesPlayground() {
   const points = getPoints();
 
   return (
-    <div className="rounded-xl border border-border bg-card p-6 my-6">
+    <div className="rounded-xl border border-border bg-card p-6 my-6 shadow-sm hover:shadow-md transition-shadow duration-300">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Controls */}
         <div className="space-y-6">

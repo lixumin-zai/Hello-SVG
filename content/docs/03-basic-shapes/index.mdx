@@ -5,7 +5,9 @@ icon: 'Minus'
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Cards, Card } from 'fumadocs-ui/components/card';
 import { LineRectPlayground } from '@/components/docs/03-basic-shapes/lines-rects/LineRectPlayground';
+import { RectCornerVisualizer } from '@/components/docs/03-basic-shapes/lines-rects/RectCornerVisualizer';
 
 虽然 SVG 的终极武器是 `<path>`（路径），但对于一些规则的几何图形，使用语义化的基础形状元素会更简单、代码更易读。
 
@@ -21,28 +23,41 @@ import { LineRectPlayground } from '@/components/docs/03-basic-shapes/lines-rect
 
 ## 重点解析
 
-### `<line>` 直线
-直线是最基础的元素，它只需要知道**起点**和**终点**。
+基础形状的绘制非常直观，它们依靠一系列核心属性来确定位置和大小。
 
-*   `x1`, `y1`：起点的 X 和 Y 坐标。
-*   `x2`, `y2`：终点的 X 和 Y 坐标。
+<Cards>
+  <Card title="<line> 直线" icon="📏">
+    最基础的元素，只需要知道**起点**和**终点**。
+    
+    *   **`x1`, `y1`**：起点的 X 和 Y 坐标。
+    *   **`x2`, `y2`**：终点的 X 和 Y 坐标。
+  </Card>
+
+  <Card title="<polyline> 折线" icon="📈">
+    一系列相连的直线段，主要用于绘制折线图或未闭合边缘。
+    
+    *   **`points`**：包含一系列点坐标的列表（如 `"0,0 50,50"`）。
+    *   **开放路径**：默认是**不闭合**的，起点和终点不会自动连起来。
+  </Card>
+
+  <Card title="<rect> 矩形" icon="⏹️">
+    绘制标准的矩形或带有圆角的矩形。
+    
+    *   **`x`, `y`**：矩形**左上角**的坐标（非中心点）。
+    *   **`width`, `height`**：宽度和高度。
+  </Card>
+</Cards>
 
 <Callout type="warn" title="不可见的直线">
   <strong>直线没有面积，只有长度！</strong>因此，它不会响应 <code>fill</code>（填充色）属性。如果你不给它设置 <code>stroke</code>（描边颜色）和 <code>stroke-width</code>，它是完全不可见的。
 </Callout>
 
-### `<polyline>` 折线
-折线是一系列相连的直线段。它主要用于绘制折线图或多边形的未闭合边缘。
+### 矩形的圆角魔法 (rx & ry)
 
-*   `points`：包含一系列点坐标的列表。格式非常灵活，数字之间可以用空格、逗号或甚至回车分隔。例如：`"0,0 50,50 50,100"` 或者 `"0 0, 50 50, 50 100"` 都是合法的。
-*   **开放路径**：与后面要讲的 `<polygon>` 不同，`<polyline>` 默认是**不闭合**的（起点和终点不会自动连起来）。
+除了基础的长宽外，`<rect>` 元素还可以通过 `rx` 和 `ry` 属性来创建圆角效果。
 
-### `<rect>` 矩形
-绘制矩形或圆角矩形。
+<RectCornerVisualizer />
 
-*   `x`, `y`：矩形**左上角**的坐标。（注意：不是中心点！）
-*   `width`, `height`：宽度和高度。
-*   `rx`, `ry`：圆角半径。
-    *   如果只设置了 `rx`，那么 `ry` 会自动等于 `rx`（产生正圆角）。
-    *   如果 `rx` 和 `ry` 的值不同，会产生椭圆形的圆角。
-    *   如果 `rx` 的值超过了矩形宽度的一半，它会被限制在宽度的一半（这可以用来快速画出“胶囊”形状）。
+- 如果只设置了 `rx`，那么 `ry` 会自动等于 `rx`（产生正圆角）。
+- 如果 `rx` 和 `ry` 的值不同，会产生椭圆形的圆角。
+- 如果 `rx` 的值超过了矩形宽度的一半，它会被限制在宽度的一半（这常被用来快速画出“胶囊”形状）。

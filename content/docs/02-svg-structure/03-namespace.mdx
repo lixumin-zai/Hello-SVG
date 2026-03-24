@@ -5,6 +5,8 @@ icon: 'Braces'
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
+import { NamespaceVisualizer } from '@/components/docs/02-svg-structure/namespace/NamespaceVisualizer';
+import { ForeignObjectDemo } from '@/components/docs/02-svg-structure/namespace/ForeignObjectDemo';
 
 如果你打开从 Illustrator 或 Figma 导出的 SVG 文件，你经常会看到 `<svg>` 标签上挂着一大堆以 `xmlns:` 开头的属性。这一节我们将揭开它们的神秘面纱。
 
@@ -16,11 +18,7 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 ### 默认 SVG 命名空间
 
-```xml
-<svg xmlns="http://www.w3.org/2000/svg">
-  <!-- 这里的元素都被认为属于 SVG 规范 -->
-</svg>
-```
+<NamespaceVisualizer />
 
 这是最核心的属性。如果没有它：
 * 作为独立 `.svg` 文件在浏览器中打开时，浏览器会把它当成普通 XML 文本渲染，而不是画出图形。
@@ -51,7 +49,9 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 命名空间的强大之处在于允许在同一个文档中混合使用多种 XML 语言。
 
-最典型的例子是使用 `<foreignObject>` 标签。通过声明 HTML 的命名空间，我们可以在 SVG 中直接嵌入标准的 HTML 元素（如自动换行的段落、复杂的表单组件）：
+最典型的例子是使用 `<foreignObject>` 标签。通过声明 HTML 的命名空间，我们可以在 SVG 中直接嵌入标准的 HTML 元素（如自动换行的段落、复杂的交互式表单）：
+
+<ForeignObjectDemo />
 
 ```xml
 <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">

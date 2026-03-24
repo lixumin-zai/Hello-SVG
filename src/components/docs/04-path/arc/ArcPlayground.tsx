@@ -19,7 +19,7 @@ export function ArcPlayground() {
   const fullPath = `M ${startX} ${startY} ${arcCommand}`;
 
   return (
-    <div className="rounded-xl border border-border bg-card p-6 my-6">
+    <div className="rounded-xl border border-border bg-card p-6 my-6 shadow-sm hover:shadow-md transition-shadow duration-300">
       <p className="text-sm text-muted-foreground mb-4">
         ▶ 调节参数，理解 SVG 中最复杂的 A (Arc) 命令的 7 个参数
       </p>

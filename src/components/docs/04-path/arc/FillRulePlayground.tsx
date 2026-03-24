@@ -12,7 +12,7 @@ export function FillRulePlayground() {
   const circlesPath = "M 100 150 A 60 60 0 1 1 100 149.9 Z M 200 150 A 60 60 0 1 1 200 149.9 Z";
 
   return (
-    <div className="rounded-xl border border-border bg-card p-6 my-6">
+    <div className="rounded-xl border border-border bg-card p-6 my-6 shadow-sm hover:shadow-md transition-shadow duration-300">
       <div className="flex flex-col md:flex-row gap-8 items-center">
         
         {/* Controls */}

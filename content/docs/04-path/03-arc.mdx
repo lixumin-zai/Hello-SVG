@@ -5,6 +5,8 @@ icon: 'Target'
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Cards, Card } from 'fumadocs-ui/components/card';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { ArcPlayground } from '@/components/docs/04-path/arc/ArcPlayground';
 import { FillRulePlayground } from '@/components/docs/04-path/arc/FillRulePlayground';
 
@@ -26,15 +28,28 @@ import { FillRulePlayground } from '@/components/docs/04-path/arc/FillRulePlaygr
 <ArcPlayground />
 
 ### 参数速记指南
-- `rx`, `ry`：椭圆的横向和纵向半径。如果是画正圆的弧线，这两个值相等即可。
-- `x-axis-rotation`：整个椭圆绕 X 轴旋转的角度。
-- **`large-arc-flag` (大弧标志)**：
+
+<Steps>
+<Step>
+**`rx`, `ry`**：椭圆的横向和纵向半径。如果是画正圆的弧线，这两个值相等即可。
+</Step>
+<Step>
+**`x-axis-rotation`**：整个椭圆绕 X 轴旋转的角度。
+</Step>
+<Step>
+**`large-arc-flag` (大弧标志)**：
   - `0` = 选短的那条路（小弧）
   - `1` = 选长的那条路（大弧）
-- **`sweep-flag` (扫扫标志 / 方向标志)**：
+</Step>
+<Step>
+**`sweep-flag` (扫扫标志 / 方向标志)**：
   - `0` = 逆时针画
   - `1` = 顺时针画
-- `x`, `y`：弧线的终点坐标。
+</Step>
+<Step>
+**`x`, `y`**：弧线的终点坐标。
+</Step>
+</Steps>
 
 <Callout type="info" title="画一个完整的圆？">
   **A 命令无法画出一个完整的圆！** 因为如果起点和终点重合，数学上有无数个解。如果要用 `path` 画圆，必须用两个半圆弧（A 命令）拼接起来，或者干脆用 `<circle>` 元素。
@@ -58,3 +73,7 @@ import { FillRulePlayground } from '@/components/docs/04-path/arc/FillRulePlaygr
 2. **`evenodd`（奇偶规则）**：
    不关心画线的方向！只要射线穿过路径的次数是奇数次，就在内部（填充）；如果是偶数次，就在外部（不填充）。
    *对于制作复杂镂空图标，使用 `evenodd` 通常更简单，不用管设计软件是怎么画这些线的。*
+
+<Cards className="mt-8">
+  <Card title="回顾：贝塞尔曲线" href="./02-bezier" description="复习曲线的绘制技巧" icon="🔙" />
+</Cards>

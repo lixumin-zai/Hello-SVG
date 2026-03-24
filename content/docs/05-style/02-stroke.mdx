@@ -5,7 +5,9 @@ icon: 'Pen'
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Cards, Card } from 'fumadocs-ui/components/card';
 import { StrokePlayground } from '@/components/docs/05-style/stroke/StrokePlayground';
+import { NonScalingStrokeVisualizer } from '@/components/docs/05-style/stroke/NonScalingStrokeVisualizer';
 
 除了内部填充（Fill），给图形勾勒轮廓的**描边（Stroke）**属性在 SVG 中有着极高的地位。通过控制描边，我们可以画出各种风格的图标，甚至制作出惊艳的路径动画。
 
@@ -21,15 +23,33 @@ import { StrokePlayground } from '@/components/docs/05-style/stroke/StrokePlaygr
 
 ### 1. 线端形状 (`stroke-linecap`)
 决定了开放路径（如 `<line>` 或未闭合的 `<path>`）端点的样式：
-- `butt`（默认）：切平。线的边界正好停在端点坐标上。
-- `round`：圆角。在端点处加上一个半径为线宽一半的半圆。**这是现代 UI 图标最常用的设置！**
-- `square`：方角。在端点处加上一个长为线宽一半的矩形。（注意它会让线看起来比实际坐标长）。
+
+<Cards>
+  <Card title="butt (默认)" icon="✂️">
+    **切平**。线的边界正好停在端点坐标上，不超出几何路径分毫。
+  </Card>
+  <Card title="round" icon="💊">
+    **圆角**。在端点处加上一个半径为线宽一半的半圆。**这是现代 UI 图标最常用的设置！**
+  </Card>
+  <Card title="square" icon="🧊">
+    **方角**。在端点处加上一个长为线宽一半的矩形。（注意它会让线看起来比实际坐标长）。
+  </Card>
+</Cards>
 
 ### 2. 转角形状 (`stroke-linejoin`)
 决定了两条线相交时，拐角的样式：
-- `miter`（默认）：尖角。外侧边缘直接延伸相交。
-- `round`：圆角。拐角处用平滑的圆弧连接。
-- `bevel`：斜角。直接切平拐角。
+
+<Cards>
+  <Card title="miter (默认)" icon="📐">
+    **尖角**。外侧边缘直接延伸相交。
+  </Card>
+  <Card title="round" icon="🔄">
+    **圆角**。拐角处用平滑的圆弧连接，让图形显得柔和。
+  </Card>
+  <Card title="bevel" icon="🪚">
+    **斜角**。直接切平拐角，像被砍掉了一角。
+  </Card>
+</Cards>
 
 <Callout type="warn" title="Miterlimit (斜接限制) 的作用">
   当你使用 <code>miter</code> (尖角) 并且两条线夹角非常锐利时，那个尖角可能会伸出非常远，看起来像一根长长的刺。
@@ -42,4 +62,30 @@ import { StrokePlayground } from '@/components/docs/05-style/stroke/StrokePlaygr
 *   **`stroke-dasharray`**：定义虚线的模式。比如 `10, 5` 表示“画 10 个单位的实线，留 5 个单位的空白，如此循环”。
 *   **`stroke-dashoffset`**：定义虚线模式的起始偏移量。如果你在上面的演示器中拖动这个滑块，你会发现虚线“动”起来了！
 
-> 💡 **动画剧透**：如果我们把 `dasharray` 设置得比整条路径还要长（此时看起来是一条实线），然后把 `dashoffset` 也设置为这个长度（此时线被完全推到视线外，变空白）。接着，我们用 CSS 动画把 `dashoffset` 慢慢减小到 0，这条线就会像被人一笔一画写出来一样！这就是经典的 SVG Draw 动画。我们会在第十二章详细学习。
+<Callout type="info" title="💡 动画剧透：经典的 SVG Draw 动画原理">
+  如果我们把 `dasharray` 设置得比整条路径还要长（此时看起来是一条实线），然后把 `dashoffset` 也设置为这个长度（此时线被完全推到视线外，变空白）。接着，我们用 CSS 动画把 `dashoffset` 慢慢减小到 0，这条线就会像被人一笔一画写出来一样！这就是经典的 SVG Draw 动画。我们会在第十二章详细学习。
+</Callout>
+
+### 4. 响应式描边：non-scaling-stroke
+
+在响应式设计中，我们经常需要使用 CSS `transform: scale()` 或者改变 SVG 的 `viewBox` 来放大/缩小图形。默认情况下，**图形的描边会随着图形一起被等比例缩放**。
+
+但有时候，比如在制作地图、网格线或某些图标时，我们希望无论图形放大多少倍，**描边始终保持固定的像素粗细**（比如永远是 1px 的细线）。
+
+这时候，神奇的 `vector-effect="non-scaling-stroke"` 就派上用场了：
+
+<NonScalingStrokeVisualizer />
+
+<Callout type="tip" title="应用场景">
+  当你用 SVG 制作交互式地图（允许用户滚轮缩放）时，必须给国家/省份边界的 `<path>` 加上 `vector-effect="non-scaling-stroke"`，否则用户放大地图后，边界线会变得像香肠一样粗！
+</Callout>
+
+---
+
+## 接下来
+
+<Cards>
+  <Card title="5.4 混合模式与隔离" href="/docs/05-style/03-blend" icon="Layers">
+    把 Photoshop 的正片叠底、滤色、差值等混合模式带入 SVG，实现极具设计感的视觉效果。
+  </Card>
+</Cards>

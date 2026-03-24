@@ -6,25 +6,19 @@ icon: 'FileCode'
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { ViewBoxPlayground } from '@/components/docs/02-svg-structure/index/ViewBoxPlayground';
+import { StructureVisualizer } from '@/components/docs/02-svg-structure/index/StructureVisualizer';
 
 一个 SVG 文件本质上就是一个 XML 文档。了解它的基本结构和坐标系统，是掌握 SVG 的第一步。
 
 ## 基本结构
 
-下面是一个最基础的 SVG 文件示例：
+下面是一个最基础的 SVG 文件示例，我们可以通过下方的交互式代码块来了解它的各个组成部分：
 
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
-  <rect x="50" y="50" width="100" height="100" fill="blue" />
-</svg>
-```
+<StructureVisualizer />
 
-### 1. XML 声明
-第一行是 XML 声明，告诉解析器这是一个 XML 1.0 文档，编码为 UTF-8。如果你是将 SVG 内联（Inline）写在 HTML5 文档中，**这一行可以省略**。
-
-### 2. `<svg>` 根元素
-它是所有 SVG 绘图的容器。必须包含 `xmlns="http://www.w3.org/2000/svg"` 命名空间声明（内联在 HTML5 中时现代浏览器会自动处理，但为了兼容性和作为独立文件时，**强烈建议保留**）。
+<Callout type="info" title="补充说明">
+  如果你是将 SVG 内联（Inline）写在 HTML5 文档中，**XML 声明可以省略**。现代浏览器在解析 HTML5 时遇到 `<svg>` 也会自动推断命名空间，但为了保持兼容性和规范，作为独立文件时**强烈建议保留** `xmlns`。
+</Callout>
 
 ## SVG 的两套坐标系统
 
