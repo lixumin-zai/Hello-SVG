@@ -121,6 +121,31 @@ export function Editor({ value, onChange, hoveredTagIndex, onHoverTag }: EditorP
         return parseSvgSegments(value);
     }, [value, isLatexMode]);
 
+    const handleMouseMove = useCallback((e: React.MouseEvent<HTMLTextAreaElement>) => {
+        if (isLatexMode || !textareaRef.current) return;
+        
+        textareaRef.current.style.pointerEvents = 'none';
+        const el = document.elementFromPoint(e.clientX, e.clientY);
+        textareaRef.current.style.pointerEvents = 'auto';
+        
+        if (el && el.hasAttribute('data-tag-index')) {
+            const index = Number(el.getAttribute('data-tag-index'));
+            if (hoveredTagIndex !== index) {
+                onHoverTag?.(index);
+            }
+        } else {
+            if (hoveredTagIndex !== null && hoveredTagIndex !== undefined) {
+                onHoverTag?.(null);
+            }
+        }
+    }, [isLatexMode, hoveredTagIndex, onHoverTag]);
+
+    const handleMouseLeave = useCallback(() => {
+        if (!isLatexMode && hoveredTagIndex !== null && hoveredTagIndex !== undefined) {
+            onHoverTag?.(null);
+        }
+    }, [isLatexMode, hoveredTagIndex, onHoverTag]);
+
     const currentValue = isLatexMode ? latexInput : value;
 
     return (
@@ -182,28 +207,12 @@ export function Editor({ value, onChange, hoveredTagIndex, onHoverTag }: EditorP
 
             {/* Editor Area */}
             <div className="flex-1 relative bg-white/20 dark:bg-zinc-950/20 backdrop-blur-md">
-                {/* Actual textarea — sits underneath the overlay, receives keyboard input */}
-                <textarea
-                    ref={textareaRef}
-                    value={currentValue}
-                    onChange={(e) => isLatexMode ? setLatexInput(e.target.value) : onChange(e.target.value)}
-                    onScroll={syncScroll}
-                    className={`absolute inset-0 z-0 w-full h-full p-5 resize-none outline-none font-mono text-[13px] sm:text-sm leading-relaxed 
-                       bg-transparent
-                       placeholder:text-zinc-400 dark:placeholder:text-zinc-600
-                       focus:ring-0 focus:outline-none custom-scrollbar transition-colors
-                       ${!isLatexMode ? 'text-transparent caret-zinc-700 dark:caret-zinc-300' : 'text-zinc-700 dark:text-zinc-300'}`}
-                    placeholder={isLatexMode ? "Type your LaTeX formula here (e.g., E = mc^2)..." : "Paste your <svg> code here..."}
-                    spellCheck="false"
-                    style={!isLatexMode ? { caretColor: undefined } : undefined}
-                />
-
-                {/* Syntax-highlighted overlay — on top of textarea for hover detection */}
+                {/* Syntax-highlighted overlay — sits underneath textarea */}
                 {!isLatexMode && (
                     <div
                         ref={overlayRef}
                         aria-hidden="true"
-                        className="absolute inset-0 z-10 w-full h-full p-5 overflow-hidden font-mono text-[13px] sm:text-sm leading-relaxed whitespace-pre-wrap break-words pointer-events-none"
+                        className="absolute inset-0 z-0 w-full h-full p-5 overflow-hidden font-mono text-[13px] sm:text-sm leading-relaxed whitespace-pre-wrap break-words pointer-events-none"
                         style={{ overflowWrap: 'break-word' }}
                     >
                         {segments.map((seg, i) => {
@@ -212,13 +221,12 @@ export function Editor({ value, onChange, hoveredTagIndex, onHoverTag }: EditorP
                                 return (
                                     <span
                                         key={i}
+                                        data-tag-index={seg.tagIndex}
                                         className={`pointer-events-auto cursor-default rounded-sm transition-colors duration-150 ${
                                             isHovered
                                                 ? 'bg-indigo-500/20 dark:bg-indigo-400/25 text-indigo-700 dark:text-indigo-300 ring-1 ring-indigo-400/40'
-                                                : 'text-sky-700 dark:text-sky-400 hover:bg-indigo-500/10 dark:hover:bg-indigo-400/10'
+                                                : 'text-sky-700 dark:text-sky-400'
                                         }`}
-                                        onMouseEnter={() => onHoverTag?.(seg.tagIndex!)}
-                                        onMouseLeave={() => onHoverTag?.(null)}
                                     >
                                         {seg.content}
                                     </span>
@@ -233,6 +241,24 @@ export function Editor({ value, onChange, hoveredTagIndex, onHoverTag }: EditorP
                         })}
                     </div>
                 )}
+
+                {/* Actual textarea — sits on top, receives keyboard/mouse input */}
+                <textarea
+                    ref={textareaRef}
+                    value={currentValue}
+                    onChange={(e) => isLatexMode ? setLatexInput(e.target.value) : onChange(e.target.value)}
+                    onScroll={syncScroll}
+                    onMouseMove={handleMouseMove}
+                    onMouseLeave={handleMouseLeave}
+                    className={`absolute inset-0 z-10 w-full h-full p-5 resize-none outline-none font-mono text-[13px] sm:text-sm leading-relaxed 
+                       bg-transparent
+                       placeholder:text-zinc-400 dark:placeholder:text-zinc-600
+                       focus:ring-0 focus:outline-none custom-scrollbar transition-colors
+                       ${!isLatexMode ? 'text-transparent caret-zinc-700 dark:caret-zinc-300' : 'text-zinc-700 dark:text-zinc-300'}`}
+                    placeholder={isLatexMode ? "Type your LaTeX formula here (e.g., E = mc^2)..." : "Paste your <svg> code here..."}
+                    spellCheck="false"
+                    style={!isLatexMode ? { caretColor: undefined } : undefined}
+                />
             </div>
         </div>
     );

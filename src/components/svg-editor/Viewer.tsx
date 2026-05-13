@@ -60,26 +60,100 @@ export function Viewer({ svgCode, hoveredTagIndex, onHoverTag }: ViewerProps) {
         const allElements = container.querySelectorAll('*');
         const svgElements: Element[] = [];
         allElements.forEach((el) => {
-            if (SVG_ELEMENT_TAGS.has(el.tagName.toLowerCase())) {
+            if (SVG_ELEMENT_TAGS.has(el.tagName.toLowerCase()) && !el.hasAttribute('data-highlight')) {
                 svgElements.push(el);
             }
         });
         return svgElements;
     }, []);
 
-    // Highlight the hovered element in the rendered SVG
+    // Compute and render bounding-rectangle highlight overlay
+    const highlightRectRef = useRef<SVGElement | null>(null);
+
     const applyHighlight = useCallback(() => {
+        // Remove previous highlight rect
+        if (highlightRectRef.current) {
+            highlightRectRef.current.remove();
+            highlightRectRef.current = null;
+        }
+
         const svgElements = getSvgElements();
+        if (hoveredTagIndex == null || hoveredTagIndex >= svgElements.length) return;
 
-        // Remove previous highlights
-        svgElements.forEach((el) => {
-            (el as HTMLElement | SVGElement).classList.remove('svg-hover-highlight');
-        });
+        const target = svgElements[hoveredTagIndex];
+        const container = svgContainerRef.current;
+        if (!container) return;
 
-        // Apply highlight to the target element
-        if (hoveredTagIndex != null && hoveredTagIndex < svgElements.length) {
-            const target = svgElements[hoveredTagIndex] as HTMLElement | SVGElement;
-            target.classList.add('svg-hover-highlight');
+        const svgRoot = container.querySelector('svg');
+        if (!svgRoot) return;
+
+        // For <svg> root itself, highlight the entire viewBox
+        if (target === svgRoot) {
+            const vb = svgRoot.viewBox?.baseVal;
+            if (vb && vb.width > 0 && vb.height > 0) {
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', String(vb.x));
+                rect.setAttribute('y', String(vb.y));
+                rect.setAttribute('width', String(vb.width));
+                rect.setAttribute('height', String(vb.height));
+                rect.setAttribute('fill', 'rgba(99, 102, 241, 0.08)');
+                rect.setAttribute('stroke', 'rgba(99, 102, 241, 0.8)');
+                rect.setAttribute('stroke-width', '2');
+                rect.setAttribute('stroke-dasharray', '6 3');
+                rect.setAttribute('pointer-events', 'none');
+                rect.setAttribute('data-highlight', 'true');
+                svgRoot.appendChild(rect);
+                highlightRectRef.current = rect;
+            }
+            return;
+        }
+
+        try {
+            const svgEl = target as SVGGraphicsElement;
+            const clone = target.cloneNode(true) as SVGElement;
+            
+            // Helper to clean up nodes so they inherit highlight styles
+            const cleanUp = (node: Node) => {
+                if (node.nodeType === 1) { // Element
+                    const el = node as Element;
+                    el.removeAttribute('id');
+                    el.removeAttribute('class');
+                    el.removeAttribute('style');
+                    el.removeAttribute('fill');
+                    el.removeAttribute('stroke');
+                    el.removeAttribute('stroke-width');
+                    el.removeAttribute('opacity');
+                    el.removeAttribute('filter');
+                    el.removeAttribute('mask');
+                    el.removeAttribute('clip-path');
+                }
+                node.childNodes.forEach(cleanUp);
+            };
+            cleanUp(clone);
+
+            // Remove transform only on the root clone because we apply the combined CTM directly to it
+            clone.removeAttribute('transform');
+
+            const rootCTM = svgRoot.getCTM();
+            const ctm = svgEl.getCTM?.();
+            
+            if (rootCTM && ctm) {
+                const rootCTMInv = rootCTM.inverse();
+                const combined = rootCTMInv.multiply(ctm);
+                clone.setAttribute('transform', `matrix(${combined.a}, ${combined.b}, ${combined.c}, ${combined.d}, ${combined.e}, ${combined.f})`);
+            }
+
+            clone.setAttribute('fill', 'rgba(99, 102, 241, 0.2)');
+            clone.setAttribute('stroke', 'rgba(99, 102, 241, 0.8)');
+            clone.setAttribute('stroke-width', '2');
+            clone.setAttribute('stroke-dasharray', '6 3');
+            clone.setAttribute('pointer-events', 'none');
+            clone.setAttribute('data-highlight', 'true');
+
+            svgRoot.appendChild(clone);
+            highlightRectRef.current = clone;
+        } catch {
+            // Silently ignore
         }
     }, [hoveredTagIndex, getSvgElements]);
 
@@ -87,6 +161,13 @@ export function Viewer({ svgCode, hoveredTagIndex, onHoverTag }: ViewerProps) {
         if (activeTab === 'preview') {
             requestAnimationFrame(applyHighlight);
         }
+        return () => {
+            // Cleanup on unmount or re-run
+            if (highlightRectRef.current) {
+                highlightRectRef.current.remove();
+                highlightRectRef.current = null;
+            }
+        };
     }, [hoveredTagIndex, processedContent, activeTab, applyHighlight]);
 
     // Attach mouseover/mouseout listeners to the container for event delegation
@@ -167,15 +248,7 @@ export function Viewer({ svgCode, hoveredTagIndex, onHoverTag }: ViewerProps) {
 
     return (
         <div className="flex flex-col flex-1 h-full w-full relative group/viewer">
-            {/* Injected highlight styles */}
-            <style>{`
-                .svg-hover-highlight {
-                    outline: 2px dashed rgba(99, 102, 241, 0.8) !important;
-                    outline-offset: 2px;
-                    filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.5));
-                    transition: outline 0.15s ease, filter 0.15s ease;
-                }
-            `}</style>
+
 
             {/* Top Tabs */}
             <div className="flex items-center gap-1 px-3 py-2 border-b border-zinc-200/50 dark:border-zinc-800/50 bg-white/40 dark:bg-zinc-900/40 backdrop-blur-sm overflow-x-auto custom-scrollbar">
