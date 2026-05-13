@@ -72,6 +72,7 @@ export function Editor({ value, onChange, hoveredTagIndex, onHoverTag }: EditorP
     const [isConverting, setIsConverting] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const overlayRef = useRef<HTMLDivElement>(null);
+    const isHoveringEditorRef = useRef(false);
 
     const handlePaste = async () => {
         try {
@@ -148,8 +149,34 @@ export function Editor({ value, onChange, hoveredTagIndex, onHoverTag }: EditorP
 
     const currentValue = isLatexMode ? latexInput : value;
 
+    // Scroll to the highlighted tag when it changes externally
+    useEffect(() => {
+        if (
+            hoveredTagIndex !== null && 
+            hoveredTagIndex !== undefined && 
+            !isHoveringEditorRef.current && 
+            overlayRef.current && 
+            textareaRef.current
+        ) {
+            const span = overlayRef.current.querySelector(`[data-tag-index="${hoveredTagIndex}"]`);
+            if (span instanceof HTMLElement) {
+                const container = overlayRef.current;
+                const top = span.offsetTop - container.clientHeight / 2 + span.clientHeight / 2;
+                
+                textareaRef.current.scrollTo({
+                    top: Math.max(0, top),
+                    behavior: 'smooth'
+                });
+            }
+        }
+    }, [hoveredTagIndex]);
+
     return (
-        <div className="flex flex-col flex-1 h-full w-full relative group/editor">
+        <div 
+            className="flex flex-col flex-1 h-full w-full relative group/editor"
+            onMouseEnter={() => { isHoveringEditorRef.current = true; }}
+            onMouseLeave={() => { isHoveringEditorRef.current = false; }}
+        >
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-200/50 dark:border-zinc-800/50 bg-white/40 dark:bg-zinc-900/40 backdrop-blur-sm">
                 <div className="flex items-center gap-4">
